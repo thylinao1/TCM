@@ -1,14 +1,12 @@
-import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, BarChart3, Settings } from 'lucide-react';
+import { LayoutDashboard, BarChart3, Settings } from 'lucide-react';
 
 const Layout = () => {
   const location = useLocation();
 
   const navItems = [
     { path: '/', label: 'Sessions', icon: <LayoutDashboard size={20} /> },
-    { path: '/builder', label: 'Survey Builder', icon: <FileText size={20} /> },
-    { path: '/insights', label: 'Insights', icon: <BarChart3 size={20} /> },
+    { path: '/insights', label: 'Global Insights', icon: <BarChart3 size={20} /> },
   ];
 
   return (

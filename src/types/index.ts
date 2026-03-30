@@ -1,3 +1,18 @@
+export type QuestionType = 'text' | 'choice' | 'scale' | 'checkbox';
+
+export interface Question {
+  id: string;
+  text: string;
+  type: QuestionType;
+  options?: string[];
+  required?: boolean;
+}
+
+export interface SurveyTemplate {
+  title: string;
+  questions: Question[];
+}
+
 export interface Session {
   id: string;
   courseName: string;
@@ -5,6 +20,11 @@ export interface Session {
   companyTaught: string;
   trainerNotes: string;
   surveysCompleted: { pre: boolean; end: boolean; refresher: boolean };
+  surveys: {
+    pre: SurveyTemplate;
+    end: SurveyTemplate;
+    refresher: SurveyTemplate;
+  }
 }
 
 export interface FeedbackScenario {

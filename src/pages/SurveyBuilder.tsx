@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { mockAiScenario } from '../data/mockData';
 import { Sparkles, Loader2, CheckCircle2 } from 'lucide-react';
 
