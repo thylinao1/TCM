@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { initialSessions } from '../data/mockData';
+import { initialSessions, mockAiScenario } from '../data/mockData';
 import type { Session } from '../types';
 import { ChevronDown, ChevronUp, Calendar, Users, GraduationCap, Edit3, X, FileUp, Sparkles, FolderOpen, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -14,6 +14,8 @@ export default function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAIModal, setShowAIModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [fileUploaded, setFileUploaded] = useState(false);
+  const [aiContext, setAiContext] = useState('');
 
   // New Session form
   const [newCourseName, setNewCourseName] = useState('');
@@ -48,13 +50,29 @@ export default function Dashboard() {
   const handleCreateSession = () => {
     if (!newCourseName) return;
     
-    // In MVP, we just proceed to the AI Modal rather than saving to state immediately
-    // so the "AI Generation" flow feels like part of the setup.
+    // Reset AI modal state
+    setFileUploaded(false);
+    setAiContext('');
+    setIsUploading(false);
+
     setShowCreateModal(false);
     setShowAIModal(true);
   };
 
-  const finalizeSessionCreation = () => {
+  const finalizeSessionCreation = (withAi = false) => {
+    const preSurvey = JSON.parse(JSON.stringify(initialSessions[0].surveys.pre));
+    const endSurvey = JSON.parse(JSON.stringify(initialSessions[0].surveys.end));
+    const refresherSurvey = JSON.parse(JSON.stringify(initialSessions[0].surveys.refresher));
+
+    if (withAi) {
+      // Inject AI generated question dynamically into the end session template
+      endSurvey.questions.unshift({
+        id: Math.random().toString(36).substr(2, 9),
+        type: 'text',
+        text: `[AI Scenario Generated specifically for ${newCourseName}]: ${mockAiScenario.scenarioText}\n\nQuestion: ${mockAiScenario.prompt}` 
+      });
+    }
+
     const newSession: Session = {
       id: Math.random().toString(36).substr(2, 5),
       courseName: newCourseName,
@@ -63,12 +81,13 @@ export default function Dashboard() {
       trainerNotes: '',
       surveysCompleted: { pre: false, end: false, refresher: false },
       surveys: {
-        pre: JSON.parse(JSON.stringify(initialSessions[0].surveys.pre)),
-        end: JSON.parse(JSON.stringify(initialSessions[0].surveys.end)),
-        refresher: JSON.parse(JSON.stringify(initialSessions[0].surveys.refresher))
+        pre: preSurvey,
+        end: endSurvey,
+        refresher: refresherSurvey
       }
     };
-    setSessions([newSession, ...sessions]);
+    initialSessions.unshift(newSession);
+    setSessions([...initialSessions]);
     setNewCourseName('');
     setNewCompany('');
     setShowAIModal(false);
@@ -76,10 +95,19 @@ export default function Dashboard() {
   };
 
   const handleUploadSimulation = () => {
+    if (fileUploaded) return; // Prevent re-uploading
     setIsUploading(true);
     setTimeout(() => {
       setIsUploading(false);
-      finalizeSessionCreation();
+      setFileUploaded(true);
+    }, 1500);
+  };
+
+  const handleGenerateAI = () => {
+    setIsUploading(true);
+    setTimeout(() => {
+      setIsUploading(false);
+      finalizeSessionCreation(true);
     }, 2000);
   };
 
@@ -222,23 +250,50 @@ export default function Dashboard() {
                      <p className="text-xs text-slate-500">Auto-generate Tier 5 & 6 surveys</p>
                    </div>
                  </div>
-                 <button onClick={finalizeSessionCreation} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
+                 <button onClick={() => finalizeSessionCreation(false)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
               </div>
               
               <div className="p-8 space-y-6">
                  
+                 {/* Upload Drag & Drop Area */}
                  <div 
                    onClick={handleUploadSimulation}
-                   className="border-2 border-dashed border-indigo-200 bg-indigo-50/30 rounded-2xl p-8 hover:bg-indigo-50 transition-colors cursor-pointer flex flex-col items-center justify-center text-center group"
+                   className={`border-2 border-dashed rounded-2xl p-6 transition-colors flex flex-col items-center justify-center text-center ${
+                     fileUploaded ? 'border-emerald-300 bg-emerald-50 cursor-default' : 'border-indigo-200 bg-indigo-50/30 hover:bg-indigo-50 cursor-pointer group'
+                   }`}
                  >
-                    {isUploading ? (
-                      <Loader2 size={40} className="text-indigo-500 animate-spin mb-3" />
+                    {isUploading && !fileUploaded ? (
+                      <Loader2 size={36} className="text-indigo-500 animate-spin mb-3" />
+                    ) : fileUploaded ? (
+                      <Sparkles size={36} className="text-emerald-500 mb-3" />
                     ) : (
-                      <FileUp size={40} className="text-indigo-400 group-hover:text-indigo-600 transition-colors mb-3 transform group-hover:-translate-y-1" />
+                      <FileUp size={36} className="text-indigo-400 group-hover:text-indigo-600 transition-colors mb-3 transform group-hover:-translate-y-1" />
                     )}
-                    <h4 className="font-semibold text-slate-900">{isUploading ? 'Analyzing course structure...' : 'Upload Course Materials'}</h4>
-                    <p className="text-sm text-slate-500 mt-1 max-w-xs">{isUploading ? 'Applying Thalheimer LTEM rules' : 'Drag & drop PPTs, PDFs, or Syllabus docs to auto-generate scenarios.'}</p>
+                    <h4 className="font-semibold text-slate-900">
+                      {isUploading && !fileUploaded ? 'Uploading material...' : fileUploaded ? 'Syllabus_2026.pptx Uploaded successfully' : 'Upload Course Materials (Optional)'}
+                    </h4>
+                    {!fileUploaded && <p className="text-sm text-slate-500 mt-1 max-w-xs">{isUploading ? 'Securing files...' : 'Drag & drop PPTs, PDFs, or Syllabus docs.'}</p>}
                  </div>
+
+                 {/* Context Textarea */}
+                 <div>
+                   <label className="block text-sm font-semibold text-slate-700 mb-2">Context / Instructions <span className="text-slate-400 font-normal">(Optional)</span></label>
+                   <textarea 
+                     placeholder="e.g., Focus on managing difficult conversations with remote team members. Include cases about lateness." 
+                     className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none h-24 text-sm"
+                     value={aiContext}
+                     onChange={(e) => setAiContext(e.target.value)}
+                   />
+                 </div>
+
+                 <button 
+                   disabled={isUploading && fileUploaded}
+                   onClick={handleGenerateAI}
+                   className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-3.5 rounded-xl font-medium transition-all shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
+                 >
+                    {isUploading && fileUploaded ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
+                    {isUploading && fileUploaded ? 'Generating LTEM Scenarios...' : 'Generate Scenarios'}
+                 </button>
 
                  <div className="flex items-center gap-4">
                     <div className="h-px bg-slate-200 flex-1"></div>
@@ -247,8 +302,8 @@ export default function Dashboard() {
                  </div>
 
                  <button 
-                   onClick={finalizeSessionCreation}
-                   className="w-full flex items-center justify-center gap-3 border border-slate-300 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 px-4 py-4 rounded-xl font-medium transition-all"
+                   onClick={() => finalizeSessionCreation(false)}
+                   className="w-full flex items-center justify-center gap-3 border border-slate-300 hover:border-indigo-300 hover:bg-indigo-50 text-slate-700 px-4 py-3 rounded-xl font-medium transition-all"
                  >
                     <FolderOpen size={18} className="text-slate-400" />
                     Use Past Examples from Library
@@ -257,7 +312,7 @@ export default function Dashboard() {
               </div>
               
               <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
-                 <button onClick={finalizeSessionCreation} className="px-5 py-2.5 rounded-xl font-medium text-slate-500 hover:text-slate-800 transition-colors underline decoration-slate-300 underline-offset-4">
+                 <button onClick={() => finalizeSessionCreation(false)} className="px-5 py-2.5 rounded-xl font-medium text-slate-500 hover:text-slate-800 transition-colors underline decoration-slate-300 underline-offset-4">
                    Skip for now
                  </button>
               </div>
