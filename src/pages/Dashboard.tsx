@@ -69,14 +69,16 @@ export default function Dashboard() {
     const refresherSurvey = JSON.parse(JSON.stringify(initialSessions[0].surveys.refresher));
 
     if (withAi) {
+      const aiQuestions = [];
       for (let i = 0; i < aiQuantity; i++) {
         const scenario = mockAiScenariosLibrary[i % mockAiScenariosLibrary.length];
-        endSurvey.questions.unshift({
+        aiQuestions.push({
           id: Math.random().toString(36).substr(2, 9),
           type: 'text',
           text: `[AI Scenario ${i+1}/${aiQuantity}]: ${scenario.scenarioText}\n\nQuestion: ${scenario.prompt}` 
         });
       }
+      endSurvey.questions = [...aiQuestions, ...endSurvey.questions];
     }
 
     const newSession: Session = {

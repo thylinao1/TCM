@@ -103,12 +103,12 @@ const robustEndSessionTemplate = JSON.parse(JSON.stringify(endSessionTemplate));
 robustEndSessionTemplate.questions.unshift({
   id: 'dynamic-ai-2',
   type: 'text',
-  text: `[AI Scenario 1]: ${mockAiScenariosLibrary[1].scenarioText}\n\nQuestion: ${mockAiScenariosLibrary[1].prompt}` 
+  text: `[AI Scenario 2]: ${mockAiScenariosLibrary[1].scenarioText}\n\nQuestion: ${mockAiScenariosLibrary[1].prompt}` 
 });
 robustEndSessionTemplate.questions.unshift({
   id: 'dynamic-ai-1',
   type: 'text',
-  text: `[AI Scenario 2]: ${mockAiScenariosLibrary[0].scenarioText}\n\nQuestion: ${mockAiScenariosLibrary[0].prompt}` 
+  text: `[AI Scenario 1]: ${mockAiScenariosLibrary[0].scenarioText}\n\nQuestion: ${mockAiScenariosLibrary[0].prompt}` 
 });
 
 const mockPopulatedResponses: SurveyResponse[] = [
