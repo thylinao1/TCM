@@ -1,4 +1,4 @@
-import type { Session, SurveyTemplate } from '../types';
+import type { Session, SurveyTemplate, FeedbackScenario } from '../types';
 
 export const tcmServicesList = [
   'The Investigation Company',
@@ -88,7 +88,8 @@ export const initialSessions: Session[] = [
       pre: JSON.parse(JSON.stringify(preSessionTemplate)),
       end: JSON.parse(JSON.stringify(endSessionTemplate)),
       refresher: JSON.parse(JSON.stringify(refresherTemplate))
-    }
+    },
+    responses: []
   },
   {
     id: 'f9a21',
@@ -101,13 +102,33 @@ export const initialSessions: Session[] = [
       pre: JSON.parse(JSON.stringify(preSessionTemplate)),
       end: JSON.parse(JSON.stringify(endSessionTemplate)),
       refresher: JSON.parse(JSON.stringify(refresherTemplate))
-    }
+    },
+    responses: []
   }
 ];
 
-export const mockAiScenario = {
+export const mockAiScenario: FeedbackScenario = {
+  id: '1',
   scenarioText: 'A team member is continuously late to morning standups but delivers high-quality work.',
   prompt: 'Based on the LTEM principles, how do you address this without demotivating them?',
   rubric: ['Success: Addresses the lateness privately.', 'Red Flag: Punishes them publicly.', 'Red Flag: Ignores the issue.'],
   managerChecklist: ['Observe next 3 standups', 'Check 1-on-1 meeting notes to verify conversation happened']
 };
+
+export const mockAiScenariosLibrary: FeedbackScenario[] = [
+  mockAiScenario,
+  {
+    id: '2',
+    scenarioText: 'Two colleagues are arguing loudly in an open-plan office over a shared project deliverable.',
+    prompt: 'Applying the conflict resolution tools discussed today, outline your immediate next steps.',
+    rubric: ['Success: De-escalates the public argument by moving them to a private room.', 'Red Flag: Takes sides in front of the team.', 'Success: Asks open-ended questions to uncover the root cause.'],
+    managerChecklist: ['Monitor tension levels over 2 weeks', 'Review post-project feedback from both individuals']
+  },
+  {
+    id: '3',
+    scenarioText: 'A remote employee seems disconnected during meetings and misses minor email deadlines repeatedly.',
+    prompt: 'How would you re-engage this employee using the structured empathy framework?',
+    rubric: ['Success: Begins a 1-on-1 with a wellness check.', 'Red Flag: Immediately issues a formal warning.', 'Red Flag: Assumes they are looking for a new job without asking.'],
+    managerChecklist: ['Track meeting participation rate over 1 month', 'Review weekly deadline hit-rate in Jira/Asana']
+  }
+];

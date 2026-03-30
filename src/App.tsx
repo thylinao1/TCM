@@ -3,15 +3,18 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import SessionDetail from './pages/SessionDetail';
 import Insights from './pages/Insights';
+import PublicSurvey from './pages/PublicSurvey';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/q/:id/:stage" element={<PublicSurvey />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="session/:id" element={<SessionDetail />} />
           <Route path="insights" element={<Insights />} />
+          <Route path="insights/:id" element={<Insights />} />
         </Route>
       </Routes>
     </BrowserRouter>

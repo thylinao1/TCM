@@ -13,6 +13,13 @@ export interface SurveyTemplate {
   questions: Question[];
 }
 
+export interface SurveyResponse {
+  id: string;
+  stage: 'pre' | 'end' | 'refresher';
+  submittedAt: string;
+  answers: Record<string, string | string[]>;
+}
+
 export interface Session {
   id: string;
   courseName: string;
@@ -24,7 +31,8 @@ export interface Session {
     pre: SurveyTemplate;
     end: SurveyTemplate;
     refresher: SurveyTemplate;
-  }
+  };
+  responses: SurveyResponse[];
 }
 
 export interface FeedbackScenario {

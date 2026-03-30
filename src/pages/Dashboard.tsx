@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { initialSessions, mockAiScenario } from '../data/mockData';
+import { initialSessions, mockAiScenariosLibrary } from '../data/mockData';
 import type { Session } from '../types';
 import { ChevronDown, ChevronUp, Calendar, Users, GraduationCap, Edit3, X, FileUp, Sparkles, FolderOpen, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -16,6 +16,7 @@ export default function Dashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const [fileUploaded, setFileUploaded] = useState(false);
   const [aiContext, setAiContext] = useState('');
+  const [aiQuantity, setAiQuantity] = useState(2);
 
   // New Session form
   const [newCourseName, setNewCourseName] = useState('');
@@ -65,12 +66,14 @@ export default function Dashboard() {
     const refresherSurvey = JSON.parse(JSON.stringify(initialSessions[0].surveys.refresher));
 
     if (withAi) {
-      // Inject AI generated question dynamically into the end session template
-      endSurvey.questions.unshift({
-        id: Math.random().toString(36).substr(2, 9),
-        type: 'text',
-        text: `[AI Scenario Generated specifically for ${newCourseName}]: ${mockAiScenario.scenarioText}\n\nQuestion: ${mockAiScenario.prompt}` 
-      });
+      for (let i = 0; i < aiQuantity; i++) {
+        const scenario = mockAiScenariosLibrary[i % mockAiScenariosLibrary.length];
+        endSurvey.questions.unshift({
+          id: Math.random().toString(36).substr(2, 9),
+          type: 'text',
+          text: `[AI Scenario ${i+1}/${aiQuantity}]: ${scenario.scenarioText}\n\nQuestion: ${scenario.prompt}` 
+        });
+      }
     }
 
     const newSession: Session = {
@@ -84,7 +87,8 @@ export default function Dashboard() {
         pre: preSurvey,
         end: endSurvey,
         refresher: refresherSurvey
-      }
+      },
+      responses: []
     };
     initialSessions.unshift(newSession);
     setSessions([...initialSessions]);
@@ -276,14 +280,27 @@ export default function Dashboard() {
                  </div>
 
                  {/* Context Textarea */}
-                 <div>
-                   <label className="block text-sm font-semibold text-slate-700 mb-2">Context / Instructions <span className="text-slate-400 font-normal">(Optional)</span></label>
-                   <textarea 
-                     placeholder="e.g., Focus on managing difficult conversations with remote team members. Include cases about lateness." 
-                     className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none h-24 text-sm"
-                     value={aiContext}
-                     onChange={(e) => setAiContext(e.target.value)}
-                   />
+                 <div className="flex flex-col md:flex-row gap-4">
+                   <div className="flex-1">
+                     <label className="block text-sm font-semibold text-slate-700 mb-2">Context / Instructions <span className="text-slate-400 font-normal">(Optional)</span></label>
+                     <textarea 
+                       placeholder="e.g., Focus on managing difficult conversations with remote team members. Include cases about lateness." 
+                       className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none h-24 text-sm"
+                       value={aiContext}
+                       onChange={(e) => setAiContext(e.target.value)}
+                     />
+                   </div>
+                   <div className="w-full md:w-32">
+                     <label className="block text-sm font-semibold text-slate-700 mb-2">Questions <span className="text-red-500">*</span></label>
+                     <input 
+                       type="number" 
+                       min="1" 
+                       max="5"
+                       className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-semibold"
+                       value={aiQuantity}
+                       onChange={(e) => setAiQuantity(parseInt(e.target.value) || 1)}
+                     />
+                   </div>
                  </div>
 
                  <button 

@@ -121,7 +121,7 @@ export default function SessionDetail() {
           </div>
           
           <div className="flex gap-3">
-             <Link to="/insights" className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2.5 rounded-xl font-medium shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2">
+             <Link to={`/insights/${session.id}`} className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2.5 rounded-xl font-medium shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2">
                 View Responses
              </Link>
              <button onClick={() => setShowQRModal(true)} className="bg-indigo-600 border border-indigo-700 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium shadow-sm transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
