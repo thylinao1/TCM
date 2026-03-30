@@ -22,6 +22,7 @@ export default function Dashboard() {
   // New Session form
   const [newCourseName, setNewCourseName] = useState('');
   const [newCompany, setNewCompany] = useState('');
+  const [newTrainerName, setNewTrainerName] = useState('');
 
   const handleSort = (key: keyof Session) => {
     if (sortKey === key) {
@@ -81,6 +82,7 @@ export default function Dashboard() {
     const newSession: Session = {
       id: Math.random().toString(36).substr(2, 5),
       courseName: newCourseName,
+      trainerName: newTrainerName || 'Unknown Trainer',
       date: new Date().toISOString().split('T')[0],
       companyTaught: newCompany,
       trainerNotes: '',
@@ -143,6 +145,9 @@ export default function Dashboard() {
                 <th className="p-4 cursor-pointer hover:bg-slate-100 transition-colors group" onClick={() => handleSort('courseName')}>
                   <div className="flex items-center">Course Name <SortIcon columnKey="courseName" /></div>
                 </th>
+                <th className="p-4 cursor-pointer hover:bg-slate-100 transition-colors group" onClick={() => handleSort('trainerName')}>
+                  <div className="flex items-center">Trainer <SortIcon columnKey="trainerName" /></div>
+                </th>
                 <th className="p-4 cursor-pointer hover:bg-slate-100 transition-colors group" onClick={() => handleSort('date')}>
                   <div className="flex items-center">Date <SortIcon columnKey="date" /></div>
                 </th>
@@ -161,6 +166,9 @@ export default function Dashboard() {
                        <GraduationCap size={16} className="text-indigo-500" />
                        {session.courseName}
                     </Link>
+                  </td>
+                  <td className="p-4 align-top text-slate-600 font-medium">
+                    {session.trainerName}
                   </td>
                   <td className="p-4 align-top text-slate-600">
                     <div className="flex items-center gap-2">
@@ -228,6 +236,16 @@ export default function Dashboard() {
                      className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                      value={newCompany}
                      onChange={(e) => setNewCompany(e.target.value)}
+                   />
+                 </div>
+                 <div>
+                   <label className="block text-sm font-semibold text-slate-700 mb-1">Trainer Name <span className="text-slate-400 font-normal">(Optional)</span></label>
+                   <input 
+                     type="text" 
+                     placeholder="e.g. Sarah Jenkins" 
+                     className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                     value={newTrainerName}
+                     onChange={(e) => setNewTrainerName(e.target.value)}
                    />
                  </div>
               </div>

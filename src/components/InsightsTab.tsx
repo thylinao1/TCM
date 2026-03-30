@@ -1,26 +1,12 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { initialSessions, mockAiScenariosLibrary } from '../data/mockData';
-import { Check, X, FileOutput, ArrowLeft, FileText, UserCircle, Sparkles, BarChart2, MessageSquare, Star, ThumbsUp } from 'lucide-react';
+import { mockAiScenariosLibrary } from '../data/mockData';
+import { Check, X, FileOutput, FileText, UserCircle, Sparkles, BarChart2, MessageSquare, Star, ThumbsUp } from 'lucide-react';
+import type { Session } from '../types';
 
-export default function Insights() {
-  const { id } = useParams<{ id: string }>();
-  const session = initialSessions.find(s => s.id === id) || initialSessions[0];
-  
-  const [activeTab, setActiveTab] = useState<'overview' | 'responses'>('overview');
+export default function InsightsTab({ session }: { session: Session }) {
+  const [activeView, setActiveView] = useState<'overview' | 'responses'>('overview');
   const [stageFilter, setStageFilter] = useState<'pre' | 'end' | 'refresher'>('end');
   const [selectedResponseIdx, setSelectedResponseIdx] = useState(0);
-
-  if (!session) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 animate-in fade-in">
-        <h2 className="text-xl font-bold text-slate-900 mb-4">No Sessions Available</h2>
-        <Link to="/" className="text-indigo-600 hover:text-indigo-700 mt-2 flex items-center gap-2">
-          <ArrowLeft size={16} /> Go to Dashboard
-        </Link>
-      </div>
-    );
-  }
 
   const allResponses = session.responses || [];
   const filteredResponses = allResponses.filter(r => r.stage === stageFilter);
@@ -44,7 +30,7 @@ export default function Insights() {
   let validStarRatings = 0;
   
   endResponses.forEach(r => {
-    const ratingStr = r.answers['11']; // Q11 is the star rating
+    const ratingStr = r.answers['11']; 
     if (ratingStr) {
       const num = parseInt(ratingStr as string);
       if (num >= 1 && num <= 5) {
@@ -62,7 +48,7 @@ export default function Insights() {
   let validRecs = 0;
   
   endResponses.forEach(r => {
-    const recStr = r.answers['7']; // Q7 is recommendation
+    const recStr = r.answers['7']; 
     if (recStr && (recStr === 'Yes' || recStr === 'Maybe' || recStr === 'No')) {
       recCounts[recStr]++;
       validRecs++;
@@ -73,26 +59,23 @@ export default function Insights() {
     <div className="space-y-8 animate-in fade-in duration-500 pb-12">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <Link to="/" className="text-slate-500 hover:text-indigo-600 flex items-center gap-2 text-sm font-medium mb-4 transition-colors w-fit">
-            <ArrowLeft size={16} /> Back to Sessions
-          </Link>
           <div className="flex items-center gap-3">
-             <h1 className="text-3xl font-bold tracking-tight text-slate-900">Evaluation Insights</h1>
-             <span className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-1 rounded-full">{session.courseName}</span>
+             <h2 className="text-2xl font-bold tracking-tight text-slate-900">Evaluation Insights</h2>
+             <span className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-1 rounded-full">{allResponses.length} Submissions</span>
           </div>
           <p className="text-slate-500 mt-1">Review qualitative LTEM responses and AI-powered performance data.</p>
         </div>
         
         <div className="bg-slate-100 p-1 rounded-xl flex items-center">
            <button 
-             onClick={() => setActiveTab('overview')}
-             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all ${activeTab === 'overview' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+             onClick={() => setActiveView('overview')}
+             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all ${activeView === 'overview' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
            >
              <BarChart2 size={16} /> Cohort Overview
            </button>
            <button 
-             onClick={() => setActiveTab('responses')}
-             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all ${activeTab === 'responses' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+             onClick={() => setActiveView('responses')}
+             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-sm transition-all ${activeView === 'responses' ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
            >
              <MessageSquare size={16} /> Raw Responses
            </button>
@@ -105,9 +88,9 @@ export default function Insights() {
                <FileText size={32} className="text-slate-400" />
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">No Responses Yet</h3>
-            <p className="text-slate-500 max-w-sm mx-auto">Once trainees complete the QR code surveys for {session.courseName}, their answers will appear here in real-time.</p>
+            <p className="text-slate-500 max-w-sm mx-auto">Once trainees complete the QR code surveys for this session, their answers will appear here in real-time.</p>
         </div>
-      ) : activeTab === 'overview' ? (
+      ) : activeView === 'overview' ? (
         // ================= OVERVIEW TAB =================
         <div className="space-y-6 animate-in slide-in-from-bottom-4">
           
@@ -272,7 +255,7 @@ export default function Insights() {
                         if (!question) return null;
                         
                         const aiRubric = findRubricForQuestion(question.text);
-                        const isAiQuestion = !!aiRubric && stageFilter === 'end'; // Only highlight AI grading on the end session
+                        const isAiQuestion = !!aiRubric && stageFilter === 'end'; 
 
                         return (
                           <div key={qId} className={`relative p-5 rounded-2xl border ${isAiQuestion ? 'border-indigo-200 bg-indigo-50/20' : 'border-slate-100 bg-slate-50/50'}`}>

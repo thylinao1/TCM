@@ -1,12 +1,11 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, BarChart3, Settings } from 'lucide-react';
+import { LayoutDashboard, Settings } from 'lucide-react';
 
 const Layout = () => {
   const location = useLocation();
 
   const navItems = [
     { path: '/', label: 'Sessions', icon: <LayoutDashboard size={20} /> },
-    { path: '/insights', label: 'Insights', icon: <BarChart3 size={20} /> },
   ];
 
   return (

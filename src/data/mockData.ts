@@ -212,6 +212,7 @@ export const initialSessions: Session[] = [
   {
     id: 'b6e83',
     courseName: 'Leadership Executive Coaching (Q3)',
+    trainerName: 'Sarah Jenkins',
     date: '2026-04-10',
     companyTaught: 'ACME Corp',
     trainerNotes: 'Needs focus on remote communication.',
@@ -226,6 +227,7 @@ export const initialSessions: Session[] = [
   {
     id: 'f9a21',
     courseName: 'Management Basics 101',
+    trainerName: 'David Lee',
     date: '2026-04-15',
     companyTaught: 'Globex Inc',
     trainerNotes: '',

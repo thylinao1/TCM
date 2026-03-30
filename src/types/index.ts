@@ -23,6 +23,7 @@ export interface SurveyResponse {
 export interface Session {
   id: string;
   courseName: string;
+  trainerName: string;
   date: string;
   companyTaught: string;
   trainerNotes: string;

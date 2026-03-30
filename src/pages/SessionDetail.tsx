@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { initialSessions } from '../data/mockData';
 import type { Question, QuestionType } from '../types';
-import { ArrowLeft, Play, QrCode, Plus, Trash2, Edit2, Copy, CheckCircle2, X, Save } from 'lucide-react';
+import { ArrowLeft, Play, QrCode, Plus, Trash2, Edit2, Copy, CheckCircle2, X, Save, BarChart2 } from 'lucide-react';
+import InsightsTab from '../components/InsightsTab';
 
 export default function SessionDetail() {
   const { id } = useParams<{ id: string }>();
   const [session, setSession] = useState(() => initialSessions.find(s => s.id === id) || null);
-  const [activeTab, setActiveTab] = useState<'pre' | 'end' | 'refresher'>('pre');
+  const [activeTab, setActiveTab] = useState<'pre' | 'end' | 'refresher' | 'insights'>('pre');
   
   const [showQRModal, setShowQRModal] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -27,7 +28,7 @@ export default function SessionDetail() {
     );
   }
 
-  const currentSurvey = session.surveys[activeTab];
+  const currentSurvey = activeTab !== 'insights' ? session.surveys[activeTab] : null;
 
   const handleCopyLink = () => {
     setCopied(true);
@@ -41,9 +42,9 @@ export default function SessionDetail() {
         ...prev,
         surveys: {
           ...prev.surveys,
-          [activeTab]: {
-            ...prev.surveys[activeTab],
-            questions: prev.surveys[activeTab].questions.filter(q => q.id !== qId)
+          [activeTab as 'pre'|'end'|'refresher']: {
+            ...prev.surveys[activeTab as 'pre'|'end'|'refresher'],
+            questions: prev.surveys[activeTab as 'pre'|'end'|'refresher'].questions.filter(q => q.id !== qId)
           }
         }
       };
@@ -57,7 +58,7 @@ export default function SessionDetail() {
     setSession(prev => {
       if (!prev) return prev;
       
-      const currentQuestions = prev.surveys[activeTab].questions;
+      const currentQuestions = prev.surveys[activeTab as 'pre'|'end'|'refresher'].questions;
       const isExisting = currentQuestions.find(q => q.id === editingQuestion.id);
       
       const updatedQuestions = isExisting
@@ -68,8 +69,8 @@ export default function SessionDetail() {
         ...prev,
         surveys: {
           ...prev.surveys,
-          [activeTab]: {
-            ...prev.surveys[activeTab],
+          [activeTab as 'pre'|'end'|'refresher']: {
+            ...prev.surveys[activeTab as 'pre'|'end'|'refresher'],
             questions: updatedQuestions
           }
         }
@@ -121,9 +122,9 @@ export default function SessionDetail() {
           </div>
           
           <div className="flex gap-3">
-             <Link to={`/insights/${session.id}`} className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2.5 rounded-xl font-medium shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2">
-                View Responses
-             </Link>
+             <button onClick={() => setActiveTab('insights')} className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2.5 rounded-xl font-medium shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 flex items-center gap-2">
+                <BarChart2 size={18} className="text-indigo-600" /> View Responses
+             </button>
              <button onClick={() => setShowQRModal(true)} className="bg-indigo-600 border border-indigo-700 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium shadow-sm transition-all flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                 <Play size={18} /> Launch Quiz
              </button>
@@ -133,82 +134,87 @@ export default function SessionDetail() {
 
       {/* Tabs */}
       <div className="bg-white rounded-2xl p-1.5 shadow-sm border border-slate-200 flex flex-wrap gap-2">
-        {(['pre', 'end', 'refresher'] as const).map(tab => (
+        {(['pre', 'end', 'refresher', 'insights'] as const).map(tab => (
            <button 
              key={tab}
              onClick={() => setActiveTab(tab)}
-             className={`px-5 py-3 rounded-xl font-semibold text-sm transition-all flex-1 md:flex-none text-center outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
+             className={`px-5 py-3 rounded-xl font-semibold text-sm transition-all flex-1 md:flex-none text-center outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 flex items-center justify-center gap-2 ${
                activeTab === tab 
-                 ? 'bg-slate-900 text-white shadow-md' 
+                 ? (tab === 'insights' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-900 text-white shadow-md')
                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
              }`}
            >
              {tab === 'pre' && 'Pre-Session Form'}
              {tab === 'end' && 'Learner Reflection Form'}
              {tab === 'refresher' && 'Learning Transfer Report'}
+             {tab === 'insights' && <><BarChart2 size={16} /> Evaluation Insights</>}
            </button>
         ))}
       </div>
 
       {/* Survey Editor View */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-4 duration-500" key={activeTab}>
-        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">{currentSurvey.title}</h2>
-            <p className="text-slate-500 text-sm mt-1">{currentSurvey.questions.length} Questions Configured</p>
+      {activeTab === 'insights' ? (
+        <InsightsTab session={session} />
+      ) : currentSurvey ? (
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-4 duration-500" key={activeTab}>
+          <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">{currentSurvey.title}</h2>
+              <p className="text-slate-500 text-sm mt-1">{currentSurvey.questions.length} Questions Configured</p>
+            </div>
+            <button onClick={openNewQuestionModal} className="text-indigo-600 hover:text-indigo-700 font-semibold text-sm flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 px-4 py-2.5 rounded-xl transition-colors focus:ring-2 focus:ring-indigo-300 outline-none">
+              <Plus size={18} /> Add Question
+            </button>
           </div>
-          <button onClick={openNewQuestionModal} className="text-indigo-600 hover:text-indigo-700 font-semibold text-sm flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 px-4 py-2.5 rounded-xl transition-colors focus:ring-2 focus:ring-indigo-300 outline-none">
-            <Plus size={18} /> Add Question
-          </button>
-        </div>
 
-        <div className="p-6">
-          {currentSurvey.questions.length === 0 ? (
-             <div className="text-center py-12 text-slate-400">
-                <p>No questions added yet. Click "Add Question" to start building.</p>
-             </div>
-          ) : (
-            <ul className="space-y-4">
-              {currentSurvey.questions.map((q, idx) => (
-                <li key={q.id} className="group border border-slate-200 hover:border-indigo-300 rounded-2xl p-6 transition-all bg-white hover:shadow-md">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <span className="bg-slate-100 text-slate-500 text-[11px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Q{idx + 1}</span>
-                        <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">{q.type}</span>
-                      </div>
-                      <p className="font-semibold text-slate-900 leading-relaxed text-base">{q.text}</p>
-                      
-                      {q.options && q.options.length > 0 && (
-                        <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {q.options.map((opt, i) => (
-                            <div key={i} className="flex items-start gap-3 text-sm text-slate-700 bg-slate-50/80 p-3 rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors">
-                               <div className={`mt-0.5 w-4 h-4 shrink-0 border border-slate-300 bg-white ${q.type === 'choice' ? 'rounded-full' : 'rounded'}`} />
-                               <span>{opt}</span>
-                            </div>
-                          ))}
+          <div className="p-6">
+            {currentSurvey.questions.length === 0 ? (
+               <div className="text-center py-12 text-slate-400">
+                  <p>No questions added yet. Click "Add Question" to start building.</p>
+               </div>
+            ) : (
+              <ul className="space-y-4">
+                {currentSurvey.questions.map((q, idx) => (
+                  <li key={q.id} className="group border border-slate-200 hover:border-indigo-300 rounded-2xl p-6 transition-all bg-white hover:shadow-md">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <span className="bg-slate-100 text-slate-500 text-[11px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Q{idx + 1}</span>
+                          <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">{q.type}</span>
                         </div>
-                      )}
-                    </div>
+                        <p className="font-semibold text-slate-900 leading-relaxed text-base">{q.text}</p>
+                        
+                        {q.options && q.options.length > 0 && (
+                          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {q.options.map((opt, i) => (
+                              <div key={i} className="flex items-start gap-3 text-sm text-slate-700 bg-slate-50/80 p-3 rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors">
+                                 <div className={`mt-0.5 w-4 h-4 shrink-0 border border-slate-300 bg-white ${q.type === 'choice' ? 'rounded-full' : 'rounded'}`} />
+                                 <span>{opt}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
 
-                    <div className="flex flex-col items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                       <button onClick={() => openEditQuestionModal(q)} className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors outline-none focus:ring-2 focus:ring-indigo-300">
-                         <Edit2 size={18} />
-                       </button>
-                       <button onClick={() => handleDeleteQuestion(q.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors outline-none focus:ring-2 focus:ring-red-300">
-                         <Trash2 size={18} />
-                       </button>
+                      <div className="flex flex-col items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <button onClick={() => openEditQuestionModal(q)} className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors outline-none focus:ring-2 focus:ring-indigo-300">
+                           <Edit2 size={18} />
+                         </button>
+                         <button onClick={() => handleDeleteQuestion(q.id)} className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors outline-none focus:ring-2 focus:ring-red-300">
+                           <Trash2 size={18} />
+                         </button>
+                      </div>
                     </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {/* QUESTION EDITOR MODAL */}
-      {showQuestionModal && editingQuestion && (
+      {showQuestionModal && editingQuestion && currentSurvey && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
            <form onSubmit={handleSaveQuestion} className="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden">
               <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
