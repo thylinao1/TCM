@@ -290,8 +290,10 @@ export default function InsightsTab({ session }: { session: Session }) {
                        <div className="flex items-center gap-3">
                          <UserCircle size={36} className="text-slate-300" />
                          <div>
-                           <p className="font-semibold text-slate-900 text-sm">Participant {idx + 1}</p>
-                           <p className="text-xs text-slate-500 mt-0.5">{new Date(resp.submittedAt).toLocaleDateString()} • {new Date(resp.submittedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                           <p className="font-semibold text-slate-900 text-sm">{resp.participantName || `Participant ${idx + 1}`}</p>
+                           <p className="text-xs text-slate-500 mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]">
+                             {resp.participantEmail || `${new Date(resp.submittedAt).toLocaleDateString()} • ${new Date(resp.submittedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`}
+                           </p>
                          </div>
                        </div>
 

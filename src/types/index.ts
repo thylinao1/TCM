@@ -17,6 +17,8 @@ export interface SurveyResponse {
   id: string;
   stage: 'pre' | 'end' | 'refresher';
   submittedAt: string;
+  participantName?: string;
+  participantEmail?: string;
   answers: Record<string, string | string[]>;
 }
 

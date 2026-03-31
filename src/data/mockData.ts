@@ -170,6 +170,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
   {
     id: 'resp-pre-1',
     stage: 'pre',
+    participantName: 'Alex Stanton',
+    participantEmail: 'astanton@globex.com',
     submittedAt: new Date(Date.now() - 31 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
       '1': '[2] Arrange a meeting with both Sarah and Tom together so they can talk it through, and mediate the conversation yourself', 
@@ -182,6 +184,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
   {
     id: 'resp-pre-2',
     stage: 'pre',
+    participantName: 'Mia Rojas',
+    participantEmail: 'mia.rojas@acme.corp',
     submittedAt: new Date(Date.now() - 32 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
       '1': '[3] Listen to Sarah, acknowledge how she feels, and ask her what outcome she would ideally want from this situation before deciding on any action', 
@@ -195,6 +199,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
   {
     id: 'resp-end-1',
     stage: 'end',
+    participantName: 'Alex Stanton',
+    participantEmail: 'astanton@globex.com',
     submittedAt: new Date(Date.now() - 29 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
       'dynamic-ai-1': "I would calmly assert we are checking the systems immediately and taking the vendor seriously.",
@@ -212,6 +218,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
   {
     id: 'resp-end-2',
     stage: 'end',
+    participantName: 'David Chen',
+    participantEmail: 'dchen@acme.corp',
     submittedAt: new Date(Date.now() - 29 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
       'dynamic-ai-1': "Inform the vendor that threatening to halt services breaches our Master Service Agreement.",
@@ -229,6 +237,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
   {
     id: 'resp-end-3',
     stage: 'end',
+    participantName: 'Mia Rojas',
+    participantEmail: 'mia.rojas@acme.corp',
     submittedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
       '1': '[3] Meet with Priya privately, listen to her account, validate her frustration, and ask what resolution she would consider fair before taking any steps', 
@@ -242,6 +252,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
   {
     id: 'resp-end-4',
     stage: 'end',
+    participantName: 'Sam Wilson',
+    participantEmail: 'samw@acme.corp',
     submittedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
       '1': '[3] Meet with Priya privately, listen to her account, validate her frustration, and ask what resolution she would consider fair before taking any steps', 
@@ -255,6 +267,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
   {
     id: 'resp-end-5',
     stage: 'end',
+    participantName: 'Jordan Lee',
+    participantEmail: 'jlee@acme.corp',
     submittedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
       '1': '[1] Have a quiet word with Daniel and tell him to be more respectful of Priya\'s contributions in future meetings',
@@ -269,6 +283,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
   {
     id: 'resp-ref-1',
     stage: 'refresher',
+    participantName: 'Alex Stanton',
+    participantEmail: 'astanton@globex.com',
     submittedAt: new Date().toISOString(),
     answers: { 
       '1': '[3] Sit down privately with Marcus, let him share his full perspective, recognise how the experience affected him, and explore together what a constructive resolution might look like before involving anyone else', 

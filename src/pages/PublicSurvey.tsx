@@ -10,6 +10,8 @@ export default function PublicSurvey() {
   const survey = session?.surveys[stage!];
 
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [participantName, setParticipantName] = useState('');
+  const [participantEmail, setParticipantEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
   if (!session || !survey) {
@@ -41,6 +43,8 @@ export default function PublicSurvey() {
       id: Math.random().toString(36).substr(2, 9),
       stage: stage!,
       submittedAt: new Date().toISOString(),
+      participantName,
+      participantEmail,
       answers
     };
     session.responses.push(response);
@@ -76,6 +80,37 @@ export default function PublicSurvey() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Identity Verification Block */}
+          <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200">
+             <h3 className="font-semibold text-slate-900 text-lg mb-4 flex gap-3">
+               Participant Details
+             </h3>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name <span className="text-red-500">*</span></label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="Jane Doe"
+                    value={participantName}
+                    onChange={e => setParticipantName(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address <span className="text-red-500">*</span></label>
+                  <input 
+                    type="email" 
+                    required
+                    placeholder="jane@company.com"
+                    value={participantEmail}
+                    onChange={e => setParticipantEmail(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700 transition-all"
+                  />
+                </div>
+             </div>
+          </div>
+
           {survey.questions.map((q, idx) => (
             <div key={q.id} className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200">
                <h3 className="font-semibold text-slate-900 text-lg mb-4 flex gap-3">
