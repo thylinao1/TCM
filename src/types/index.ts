@@ -45,3 +45,24 @@ export interface FeedbackScenario {
   rubric: string[];
   managerChecklist: string[];
 }
+
+export const mapDbSession = (db: any): Session => ({
+  id: db.id,
+  courseName: db.course_name,
+  trainerName: db.trainer_name,
+  date: db.date,
+  companyTaught: db.company_taught,
+  trainerNotes: db.trainer_notes || '',
+  surveysCompleted: db.surveys_completed || { pre: false, end: false, refresher: false },
+  surveys: db.surveys,
+  responses: [] 
+});
+
+export const mapDbResponse = (db: any): SurveyResponse => ({
+  id: db.id,
+  stage: db.stage,
+  submittedAt: db.submitted_at,
+  participantName: db.participant_name,
+  participantEmail: db.participant_email,
+  answers: db.answers
+});

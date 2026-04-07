@@ -58,7 +58,7 @@ export default function InsightsTab({ session }: { session: Session }) {
   // --- LTEM 5 ASSESSMENT SCORING LOGIC ---
   const getScore = (answer: string | string[]): number | null => {
     if (typeof answer !== 'string') return null;
-    const match = answer.match(/^\[(\d+)\]/);
+    const match = answer.match(/\[AI_SCORE:\s*(\d+)\]/);
     return match ? parseInt(match[1], 10) : null;
   };
 
@@ -69,15 +69,14 @@ export default function InsightsTab({ session }: { session: Session }) {
     
     Object.entries(resp.answers).forEach(([qId, val]) => {
       const q = survey?.questions.find(x => x.id === qId);
-      if (!q || !q.options) return;
+      if (!q) return;
 
-      // We only score evaluation questions (they uniquely use a scale that drops to [0])
-      const isEvaluation = q.options.some(opt => opt.startsWith('[0]'));
+      const isEvaluation = typeof val === 'string' && val.includes('[AI_SCORE:');
       if (isEvaluation) {
         const s = getScore(val);
         if (s !== null) {
           earned += s;
-          possible += 3; // The max score on evaluation questions is [3]
+          possible += 10; 
         }
       }
     });
@@ -543,8 +542,16 @@ export default function InsightsTab({ session }: { session: Session }) {
                                <span className="text-indigo-500 mr-2">{index + 1}.</span> {question.text}
                              </p>
                              
-                             <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-slate-700 text-sm whitespace-pre-wrap">
-                               {Array.isArray(answer) ? answer.join(', ') : answer}
+                             <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-slate-700 text-sm whitespace-pre-wrap flex justify-between items-start gap-4">
+                               <div className="flex-1">
+                                 {Array.isArray(answer) ? answer.join(', ') : answer.replace(/\[AI_SCORE:\s*\d+\]/g, '')}
+                               </div>
+                               {typeof answer === 'string' && answer.includes('[AI_SCORE:') && (
+                                 <div className="shrink-0 bg-indigo-100 text-indigo-700 font-bold px-3 py-1.5 rounded-lg border border-indigo-200 shadow-sm text-xs flex flex-col items-center">
+                                   <span className="opacity-75 text-[9px] uppercase tracking-wider mb-0.5">AI Grade</span>
+                                   <span className="text-base">{getScore(answer)} <span className="text-[10px] opacity-75 font-medium">/ 10</span></span>
+                                 </div>
+                               )}
                              </div>
 
                              {isAiQuestion && (
