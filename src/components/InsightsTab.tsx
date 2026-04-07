@@ -16,9 +16,8 @@ export default function InsightsTab({ session }: { session: Session }) {
     return session.surveys[stage]?.questions.find(q => q.id === qId);
   };
 
-  const findRubricForQuestion = (qText: string) => {
-    if (!qText.includes('[AI Scenario')) return null;
-    return mockAiScenariosLibrary.find(ai => qText.includes(ai.prompt)) || mockAiScenariosLibrary[0];
+  const findRubricForQuestion = (stage: string, qId: string) => {
+    return mockAiScenariosLibrary.find(ai => ai.id === `ai-${stage}-${qId}`);
   };
 
   // --- AGGREGATION LOGIC ---
@@ -30,7 +29,7 @@ export default function InsightsTab({ session }: { session: Session }) {
   let validStarRatings = 0;
   
   endResponses.forEach(r => {
-    const ratingStr = r.answers['11']; 
+    const ratingStr = r.answers['13']; 
     if (ratingStr) {
       const num = parseInt(ratingStr as string);
       if (num >= 1 && num <= 5) {
@@ -48,7 +47,7 @@ export default function InsightsTab({ session }: { session: Session }) {
   let validRecs = 0;
   
   endResponses.forEach(r => {
-    const recStr = r.answers['7']; 
+    const recStr = r.answers['9']; 
     if (recStr && (recStr === 'Yes' || recStr === 'Maybe' || recStr === 'No')) {
       recCounts[recStr]++;
       validRecs++;
@@ -528,8 +527,8 @@ export default function InsightsTab({ session }: { session: Session }) {
                         const question = getQuestion(selectedResponse.stage, qId);
                         if (!question) return null;
                         
-                        const aiRubric = findRubricForQuestion(question.text);
-                        const isAiQuestion = !!aiRubric && stageFilter === 'end'; 
+                        const aiRubric = findRubricForQuestion(selectedResponse.stage, qId);
+                        const isAiQuestion = !!aiRubric; 
 
                         return (
                           <div key={qId} className={`relative p-5 rounded-2xl border ${isAiQuestion ? 'border-indigo-200 bg-indigo-50/20' : 'border-slate-100 bg-slate-50/50'}`}>
@@ -556,15 +555,24 @@ export default function InsightsTab({ session }: { session: Session }) {
 
                              {isAiQuestion && (
                                <div className="mt-4 pt-4 border-t border-indigo-100">
-                                 <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">AI Evaluation Rubric</h4>
-                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                   <div className="space-y-2">
-                                     {aiRubric.rubric.map((r, i) => (
-                                        <div key={i} className="flex gap-2 text-sm text-slate-600 font-medium">
-                                          {r.startsWith('Success') ? <Check size={16} className="text-emerald-500 shrink-0 mt-0.5" /> : <X size={16} className="text-red-500 shrink-0 mt-0.5" />}
-                                          <span>{r}</span>
-                                        </div>
-                                     ))}
+                                 <div className="flex items-center justify-between mb-3">
+                                   <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">AI Evaluation Rubric (Trainer Adjustable)</h4>
+                                   <button className="text-[10px] text-indigo-600 font-bold hover:bg-indigo-100 uppercase tracking-wider bg-indigo-50 px-2.5 py-1.5 rounded transition-colors">Save Adjustments</button>
+                                 </div>
+                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                   <div className="space-y-3">
+                                     {aiRubric.rubric.map((r, i) => {
+                                        const isSuccess = r.startsWith('Success');
+                                        return (
+                                          <div key={i} className="flex gap-2 text-sm text-slate-600 font-medium items-start">
+                                            {isSuccess ? <Check size={16} className="text-emerald-500 shrink-0 mt-2" /> : <X size={16} className="text-red-500 shrink-0 mt-2" />}
+                                            <div className="flex-1">
+                                              <span className={`text-[10px] uppercase font-bold tracking-wider block mb-1 ${isSuccess ? 'text-emerald-600' : 'text-red-600'}`}>{isSuccess ? 'Success Metric' : 'Failure Metric'}</span>
+                                              <textarea defaultValue={r.replace(/^(Success|Fail):\s*/, '')} className="w-full text-sm border-slate-200 rounded-lg p-2.5 bg-white shadow-sm focus:ring-2 focus:ring-indigo-100 resize-none h-16" />
+                                            </div>
+                                          </div>
+                                        )
+                                     })}
                                    </div>
                                    <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
                                       <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Manager Observation Checklist (Tier 6)</h5>

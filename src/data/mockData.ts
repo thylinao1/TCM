@@ -1,36 +1,97 @@
 import type { Session, SurveyResponse, FeedbackScenario, SurveyTemplate } from '../types';
 
 export const mockAiScenariosLibrary: FeedbackScenario[] = [
+  // What You Know Scenarios
   {
-    id: 'ai-req-1',
-    scenarioText: "A vendor calls you furious that their invoice hasn't been paid for 60 days. They are threatening to halt all services tomorrow, which would stop production.",
-    prompt: "Write exactly what you would say on the phone right now to de-escalate this vendor.",
+    id: 'ai-pre-1',
+    scenarioText: "You overhear two team members having a heated argument about workload distribution in the breakroom. One is threatening to quit.",
+    prompt: "What is your immediate response to this situation?",
     rubric: [
-      "Success: Acknowledged the vendor's frustration and urgency.",
-      "Success: Committed to investigating the payment immediately.",
-      "Fail: Defended the company's accounting department.",
-      "Fail: Made a hard promise on a specific payment time without checking."
+      "Success: Separate the team members safely without taking sides.",
+      "Success: Validate the emotions without validating the behavior.",
+      "Fail: Attempt to mediate on the spot in front of others.",
+      "Fail: Threaten disciplinary action immediately."
     ],
     managerChecklist: [
-      "Remains calm under fire",
-      "Avoids placing internal blame",
-      "Focuses on process resolution"
+      "Prioritizes de-escalation over resolution",
+      "Maintains neutral tone and body language"
     ]
   },
   {
-    id: 'ai-req-2',
-    scenarioText: "Your top-performing employee sends an email at 10pm saying they are 'burned out' and need to take 2 weeks of leave immediately starting tomorrow.",
-    prompt: "Draft an email response to this employee.",
+    id: 'ai-pre-2',
+    scenarioText: "A project has fallen behind schedule because two departments are refusing to share data, each blaming the other for the delay.",
+    prompt: "How do you approach the department heads to resolve this deadlock?",
     rubric: [
-      "Success: Prioritizes employee well-being over coverage gaps.",
-      "Success: Approves the immediate time off unconditionally.",
-      "Fail: Asks them to finish their current project first.",
-      "Fail: Mentions the hardship this will put on the rest of the team."
+      "Success: Initiate a joint meeting focusing strictly on process, not blame.",
+      "Success: Reframe the conversation to highlight shared organizational goals.",
+      "Fail: Escalates to executives before attempting peer-to-peer facilitation.",
+      "Fail: Takes one department's side based on historical reliability."
     ],
     managerChecklist: [
-      "Empathy first communication",
-      "Decisive crisis management",
-      "Protects psychological safety"
+      "Focuses on systemic issues rather than personalities",
+      "Reinforces mutual dependencies"
+    ]
+  },
+  // What You Learnt Scenarios
+  {
+    id: 'ai-end-1',
+    scenarioText: "During a facilitated conversation between two conflicting employees, one suddenly walks out of the room in anger.",
+    prompt: "Based on today's mediation training, what should be your next steps?",
+    rubric: [
+      "Success: Allow a cooling-off period before pursuing them.",
+      "Success: Follow up privately to explore what triggered the walk-out.",
+      "Fail: Force them back into the room immediately.",
+      "Fail: Declare the mediation a failure and move to formal grievance."
+    ],
+    managerChecklist: [
+      "Respects physiological boundaries in conflict",
+      "Demonstrates the 'Structured Empathy' technique"
+    ]
+  },
+  {
+    id: 'ai-end-2',
+    scenarioText: "You must address an employee who has been consistently interrupting and belittling a colleague during team meetings.",
+    prompt: "Using the frameworks taught today, outline the structure of your conversation with them.",
+    rubric: [
+      "Success: Clearly states observable behaviors (e.g. 'You interrupted 3 times').",
+      "Success: Asks open questions to understand their perspective.",
+      "Fail: Uses labels like 'You have a bad attitude'.",
+      "Fail: Tells them exactly how they must behave without securing buy-in."
+    ],
+    managerChecklist: [
+      "Uses non-violent communication methodology",
+      "Maintains the adult-to-adult dynamic"
+    ]
+  },
+  // What You Did Scenarios
+  {
+    id: 'ai-ref-1',
+    scenarioText: "Think of a time in the past month where you noticed a potential conflict brewing between colleagues.",
+    prompt: "How did you use early intervention mediation techniques to prevent it from escalating?",
+    rubric: [
+      "Success: Describes specifically spotting an issue before formal complaints arose.",
+      "Success: Outlines bringing them together or informally coaching.",
+      "Fail: Mentions ignoring it until it became a bigger issue.",
+      "Fail: Admits to bypassing mediation and going straight to HR."
+    ],
+    managerChecklist: [
+      "Shows active application of Early Resolution",
+      "Evidences sustained behavioral change"
+    ]
+  },
+  {
+    id: 'ai-ref-2',
+    scenarioText: "Describe a situation since the training where you successfully mediated a dispute using the structured empathy approach.",
+    prompt: "How did the participants react, and what was the outcome?",
+    rubric: [
+      "Success: Explicitly mentions a clear outcome or mutually agreed resolution.",
+      "Success: Reflects on the participants' emotional shift.",
+      "Fail: Could not provide a real example.",
+      "Fail: The outcome resolved the operational issue but damaged the relationship."
+    ],
+    managerChecklist: [
+      "Transforms toxic conflict into constructive dialogue",
+      "Achieves 'Win-Win' alignments"
     ]
   }
 ];
@@ -38,21 +99,21 @@ export const mockAiScenariosLibrary: FeedbackScenario[] = [
 export const preSessionTemplate: SurveyTemplate = {
   title: 'What You Know',
   questions: [
-    { id: '1', type: 'text', text: '1. You overhear two team members having a heated argument about workload distribution in the breakroom. One is threatening to quit. What is your immediate response to this situation?' },
-    { id: '2', type: 'text', text: '2. A project has fallen behind schedule because two departments are refusing to share data, each blaming the other for the delay. How do you approach the department heads to resolve this deadlock?' },
-    { id: '3', type: 'text', text: '1. What motivated you to attend this course?' },
-    { id: '4', type: 'text', text: '2. Describe a recent situation related to this course topic that you had to deal with. What did you do?' },
-    { id: '5', type: 'choice', text: '3. Which statement best describes your current confidence in handling situations related to this course?', options: [
+    { id: '1', type: 'text', text: 'You overhear two team members having a heated argument about workload distribution in the breakroom. One is threatening to quit. What is your immediate response to this situation?' },
+    { id: '2', type: 'text', text: 'A project has fallen behind schedule because two departments are refusing to share data, each blaming the other for the delay. How do you approach the department heads to resolve this deadlock?' },
+    { id: '3', type: 'text', text: 'What motivated you to attend this course?' },
+    { id: '4', type: 'text', text: 'Describe a recent situation related to this course topic that you had to deal with. What did you do?' },
+    { id: '5', type: 'choice', text: 'Which statement best describes your current confidence in handling situations related to this course?', options: [
       'I handle these situations effectively',
       'I manage some aspects but struggle with others',
       'I often feel unsure or avoid these situations',
       'I have little or no experience with these situations'
     ] },
-    { id: '6', type: 'text', text: '4. What is one situation in your role at work, where you would most like to improve your approach related to this course?' },
-    { id: '7', type: 'text', text: '5. What skills, behavior or capabilities do you hope to achieve from this training course?' },
-    { id: '8', type: 'text', text: '6. Is there anything else you feel the trainer needs to know to help ensure your experience meets your needs?' },
-    { id: '9', type: 'choice', text: '7. May TCM use your response in marketing materials?', options: ['Yes, happy to use', 'No, please don\'t use'] },
-    { id: '10', type: 'checkbox', text: '8. Please tick in the other TCM services you would be interested in:', options: [
+    { id: '6', type: 'text', text: 'What is one situation in your role at work, where you would most like to improve your approach related to this course?' },
+    { id: '7', type: 'text', text: 'What skills, behavior or capabilities do you hope to achieve from this training course?' },
+    { id: '8', type: 'text', text: 'Is there anything else you feel the trainer needs to know to help ensure your experience meets your needs?' },
+    { id: '9', type: 'choice', text: 'May TCM use your response in marketing materials?', options: ['Yes, happy to use', 'No, please don\'t use'] },
+    { id: '10', type: 'checkbox', text: 'Please tick in the other TCM services you would be interested in:', options: [
       'The Investigation Company', 'The Mediation Company', 'Resolution Framework', 'The TCM Academy', 'The People and Culture Association', 'Engage Leadership', 'Engage Coaching', 'People and Culture', 'Other'
     ] }
   ]
@@ -61,49 +122,49 @@ export const preSessionTemplate: SurveyTemplate = {
 export const endSessionTemplate: SurveyTemplate = {
   title: 'What You Learnt',
   questions: [
-    { id: '1', type: 'text', text: '1. During a facilitated conversation between two conflicting employees, one suddenly walks out of the room in anger. Based on today\'s mediation training, what should be your next steps?' },
-    { id: '2', type: 'text', text: '2. You must address an employee who has been consistently interrupting and belittling a colleague during team meetings. Using the frameworks taught today, outline the structure of your conversation with them.' },
-    { id: '3', type: 'text', text: '1. What is one concept, tool, or idea from today that you understand clearly and could explain to a colleague?' },
-    { id: '4', type: 'text', text: '2. Imagine you’re back at work tomorrow. Which situation would you apply this training to first, and what would you do differently?' },
-    { id: '5', type: 'choice', text: '3. Choose the statement that best describes your readiness to apply what you learned:', options: [
+    { id: '1', type: 'text', text: 'During a facilitated conversation between two conflicting employees, one suddenly walks out of the room in anger. Based on today\'s mediation training, what should be your next steps?' },
+    { id: '2', type: 'text', text: 'You must address an employee who has been consistently interrupting and belittling a colleague during team meetings. Using the frameworks taught today, outline the structure of your conversation with them.' },
+    { id: '3', type: 'text', text: 'What is one concept, tool, or idea from today that you understand clearly and could explain to a colleague?' },
+    { id: '4', type: 'text', text: 'Imagine you’re back at work tomorrow. Which situation would you apply this training to first, and what would you do differently?' },
+    { id: '5', type: 'choice', text: 'Choose the statement that best describes your readiness to apply what you learned:', options: [
       'I can confidently apply the tools in real situations',
       'I can apply some tools but would like more practice',
       'I understand the concepts but don’t yet feel ready to use them',
       'I’m unclear on how to apply the tools'
     ] },
-    { id: '6', type: 'choice', text: '4. During the session, you practised scenarios or role-plays. Which statement best reflects your performance?', options: [
+    { id: '6', type: 'choice', text: 'During the session, you practised scenarios or role-plays. Which statement best reflects your performance?', options: [
       'I demonstrated the behaviors effectively',
       'I partially demonstrated them and know what to improve',
       'I struggled to demonstrate the behaviors',
       'We didn’t do a scenario/role-play'
     ] },
-    { id: '7', type: 'text', text: '5. What positive outcome do you expect this training to help you achieve in your role?' },
-    { id: '8', type: 'text', text: '6. What improvements would make this course even better or more useful for you? (E.g. Training Style, course structure, content relevance, pace, etc.)' },
-    { id: '9', type: 'choice', text: '7. Would you recommend this course to a colleague?', options: ['Yes', 'Maybe', 'No'] },
-    { id: '10', type: 'text', text: '8. TCM loves celebrating our customers’ successes and sharing their stories. If you would like to share a testimonial about your experience, please add it here:' },
-    { id: '11', type: 'choice', text: '9. May TCM use your response in marketing materials?', options: ['Yes, happy to use', 'No, please don\'t use'] },
-    { id: '12', type: 'checkbox', text: '10. Please tick in the other TCM services you would be interested in:', options: [
+    { id: '7', type: 'text', text: 'What positive outcome do you expect this training to help you achieve in your role?' },
+    { id: '8', type: 'text', text: 'What improvements would make this course even better or more useful for you? (E.g. Training Style, course structure, content relevance, pace, etc.)' },
+    { id: '9', type: 'choice', text: 'Would you recommend this course to a colleague?', options: ['Yes', 'Maybe', 'No'] },
+    { id: '10', type: 'text', text: 'TCM loves celebrating our customers’ successes and sharing their stories. If you would like to share a testimonial about your experience, please add it here:' },
+    { id: '11', type: 'choice', text: 'May TCM use your response in marketing materials?', options: ['Yes, happy to use', 'No, please don\'t use'] },
+    { id: '12', type: 'checkbox', text: 'Please tick in the other TCM services you would be interested in:', options: [
       'The Investigation Company', 'The Mediation Company', 'Resolution Framework', 'The TCM Academy', 'The People and Culture Association', 'Engage Leadership', 'Engage Coaching', 'People and Culture', 'Other'
     ] },
-    { id: '13', type: 'scale', text: '11. Overall, how would you rate the course? (Please shade in the stars with 1 being very poor and 5 being very good.) NOTE: Please also visit TrustPilot after submitting to leave your review via the external link provided by your trainer!', options: ['1','2','3','4','5'] }
+    { id: '13', type: 'scale', text: 'Overall, how would you rate the course? (Please shade in the stars with 1 being very poor and 5 being very good.) NOTE: Please also visit TrustPilot after submitting to leave your review via the external link provided by your trainer!', options: ['1','2','3','4','5'] }
   ]
 };
 
 export const refresherTemplate: SurveyTemplate = {
   title: 'What You Did',
   questions: [
-    { id: '1', type: 'text', text: '1. Think of a time in the past month where you noticed a potential conflict brewing between colleagues. How did you use early intervention mediation techniques to prevent it from escalating?' },
-    { id: '2', type: 'text', text: '2. Describe a situation since the training where you successfully mediated a dispute using the structured empathy approach. How did the participants react, and what was the outcome?' },
-    { id: '3', type: 'text', text: '1. List the situations where you felt like you had an opportunity to apply the training at work, in the past month.' },
-    { id: '4', type: 'text', text: '2. Describe a real situation where you applied something from the training at work. What was the situation? Which specific skill or method did you use? What did you do step-by-step? What happened as a result?' },
-    { id: '5', type: 'text', text: '3. Which parts of the training felt difficult to apply in real work? Why?' },
-    { id: '6', type: 'text', text: '4. Since the training, what have you done differently at work?' },
-    { id: '7', type: 'text', text: '5. What support, tools, or conditions helped you apply what you learnt?' },
-    { id: '8', type: 'text', text: '6. What improvements would make this course even better or more useful for you? (E.g. Training Style, course structure, content relevance, pace, etc.)' },
-    { id: '9', type: 'choice', text: '7. Would you recommend this course to a colleague?', options: ['Yes', 'Maybe', 'No'] },
-    { id: '10', type: 'text', text: '8. TCM loves celebrating our customers’ successes and sharing their stories. If you would like to share a testimonial about your experience, please add it here:' },
-    { id: '11', type: 'choice', text: '9. May TCM use your response in marketing materials?', options: ['Yes', 'happy to use', 'No, please don\'t use'] },
-    { id: '12', type: 'checkbox', text: '10. Please tick in the other TCM services you would be interested in:', options: [
+    { id: '1', type: 'text', text: 'Think of a time in the past month where you noticed a potential conflict brewing between colleagues. How did you use early intervention mediation techniques to prevent it from escalating?' },
+    { id: '2', type: 'text', text: 'Describe a situation since the training where you successfully mediated a dispute using the structured empathy approach. How did the participants react, and what was the outcome?' },
+    { id: '3', type: 'text', text: 'List the situations where you felt like you had an opportunity to apply the training at work, in the past month.' },
+    { id: '4', type: 'text', text: 'Describe a real situation where you applied something from the training at work. What was the situation? Which specific skill or method did you use? What did you do step-by-step? What happened as a result?' },
+    { id: '5', type: 'text', text: 'Which parts of the training felt difficult to apply in real work? Why?' },
+    { id: '6', type: 'text', text: 'Since the training, what have you done differently at work?' },
+    { id: '7', type: 'text', text: 'What support, tools, or conditions helped you apply what you learnt?' },
+    { id: '8', type: 'text', text: 'What improvements would make this course even better or more useful for you? (E.g. Training Style, course structure, content relevance, pace, etc.)' },
+    { id: '9', type: 'choice', text: 'Would you recommend this course to a colleague?', options: ['Yes', 'Maybe', 'No'] },
+    { id: '10', type: 'text', text: 'TCM loves celebrating our customers’ successes and sharing their stories. If you would like to share a testimonial about your experience, please add it here:' },
+    { id: '11', type: 'choice', text: 'May TCM use your response in marketing materials?', options: ['Yes', 'happy to use', 'No, please don\'t use'] },
+    { id: '12', type: 'checkbox', text: 'Please tick in the other TCM services you would be interested in:', options: [
       'The Investigation Company', 'The Mediation Company', 'Resolution Framework', 'The TCM Academy', 'The People and Culture Association', 'Engage Leadership', 'Engage Coaching', 'People and Culture', 'Other'
     ] }
   ]
