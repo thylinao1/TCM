@@ -17,7 +17,7 @@ export default function InsightsTab({ session }: { session: Session }) {
   };
 
   const findRubricForQuestion = (stage: string, qId: string) => {
-    return mockAiScenariosLibrary.find(ai => ai.id === `ai-${stage}-${qId}`);
+    return mockAiScenariosLibrary.find(ai => ai.id === `ai-${stage}-${qId}` || qId.startsWith(ai.id));
   };
 
   // --- AGGREGATION LOGIC ---

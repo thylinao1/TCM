@@ -73,9 +73,9 @@ export default function Dashboard() {
       for (let i = 0; i < aiQuantity; i++) {
         const scenario = mockAiScenariosLibrary[i % mockAiScenariosLibrary.length];
         aiQuestions.push({
-          id: Math.random().toString(36).substr(2, 9),
+          id: scenario.id + '-x' + Math.random().toString(36).substr(2, 5),
           type: 'text',
-          text: `[AI Scenario ${i+1}/${aiQuantity}]: ${scenario.scenarioText}\n\nQuestion: ${scenario.prompt}` 
+          text: `${scenario.scenarioText} ${scenario.prompt}`
         });
       }
       endSurvey.questions = [...aiQuestions, ...endSurvey.questions];
