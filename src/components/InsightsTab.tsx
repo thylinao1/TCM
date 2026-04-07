@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { mockAiScenariosLibrary } from '../data/mockData';
 import { Check, X, FileOutput, FileText, UserCircle, Sparkles, BarChart2, MessageSquare, Star, ThumbsUp, Target, TrendingUp, TrendingDown, Minus, ArrowRight } from 'lucide-react';
 import type { Session, SurveyResponse } from '../types';
@@ -8,7 +8,12 @@ export default function InsightsTab({ session }: { session: Session }) {
   const [stageFilter, setStageFilter] = useState<'pre' | 'end' | 'refresher'>('end');
   const [selectedResponseIdx, setSelectedResponseIdx] = useState(0);
 
-  const allResponses = session.responses || [];
+  const [allResponses, setAllResponses] = useState(session.responses || []);
+
+  useEffect(() => {
+    setAllResponses(session.responses || []);
+  }, [session.responses]);
+
   const filteredResponses = allResponses.filter(r => r.stage === stageFilter);
   const selectedResponse = filteredResponses[selectedResponseIdx] || filteredResponses[0];
 
@@ -17,7 +22,8 @@ export default function InsightsTab({ session }: { session: Session }) {
   };
 
   const findRubricForQuestion = (stage: string, qId: string) => {
-    return mockAiScenariosLibrary.find(ai => ai.id === `ai-${stage}-${qId}` || qId.startsWith(ai.id));
+    const stagePrefix = stage === 'refresher' ? 'ref' : stage;
+    return mockAiScenariosLibrary.find(ai => ai.id === `ai-${stagePrefix}-${qId}` || qId.startsWith(ai.id));
   };
 
   // --- AGGREGATION LOGIC ---
@@ -532,11 +538,6 @@ export default function InsightsTab({ session }: { session: Session }) {
 
                         return (
                           <div key={qId} className={`relative p-5 rounded-2xl border ${isAiQuestion ? 'border-indigo-200 bg-indigo-50/20' : 'border-slate-100 bg-slate-50/50'}`}>
-                             {isAiQuestion && (
-                               <div className="absolute -top-3 left-4 bg-indigo-100 text-indigo-800 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded shadow-sm border border-indigo-200">
-                                 AI Scenario Eval
-                               </div>
-                             )}
                              <p className="font-semibold text-slate-800 text-sm leading-relaxed mb-3">
                                <span className="text-indigo-500 mr-2">{index + 1}.</span> {question.text}
                              </p>
@@ -548,7 +549,34 @@ export default function InsightsTab({ session }: { session: Session }) {
                                {typeof answer === 'string' && answer.includes('[AI_SCORE:') && (
                                  <div className="shrink-0 bg-indigo-100 text-indigo-700 font-bold px-3 py-1.5 rounded-lg border border-indigo-200 shadow-sm text-xs flex flex-col items-center">
                                    <span className="opacity-75 text-[9px] uppercase tracking-wider mb-0.5">AI Grade</span>
-                                   <span className="text-base">{getScore(answer)} <span className="text-[10px] opacity-75 font-medium">/ 10</span></span>
+                                   <div className="flex items-center">
+                                      <input 
+                                        type="number"
+                                        min="0"
+                                        max="10"
+                                        value={getScore(answer) !== null ? getScore(answer) as number : 0}
+                                        onChange={(e) => {
+                                          const val = parseInt(e.target.value, 10);
+                                          if (!isNaN(val) && val >= 0 && val <= 10) {
+                                            const updatedResponses = allResponses.map(r => {
+                                              if (r.id === selectedResponse.id) {
+                                                return {
+                                                  ...r,
+                                                  answers: {
+                                                    ...r.answers,
+                                                    [qId]: (r.answers[qId] as string).replace(/\[AI_SCORE:\s*\d+\]/, `[AI_SCORE: ${val}]`)
+                                                  }
+                                                };
+                                              }
+                                              return r;
+                                            });
+                                            setAllResponses(updatedResponses);
+                                          }
+                                        }}
+                                        className="w-8 text-center text-base bg-transparent border-b border-indigo-300 focus:outline-none focus:border-indigo-600 font-bold m-0 p-0 mr-1"
+                                      />
+                                      <span className="text-[10px] opacity-75 font-medium">/ 10</span>
+                                   </div>
                                  </div>
                                )}
                              </div>
