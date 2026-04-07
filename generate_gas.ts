@@ -1,17 +1,4 @@
 import { preSessionTemplate, refresherTemplate, endSessionTemplate } from './src/data/mockData';
-import { mockAiScenariosLibrary } from './src/data/mockData';
-
-const robustEndSessionTemplate = JSON.parse(JSON.stringify(endSessionTemplate));
-robustEndSessionTemplate.questions.unshift({
-  id: 'dynamic-ai-2',
-  type: 'text',
-  text: `[AI Scenario 2]: ${mockAiScenariosLibrary[1].scenarioText}\n\nQuestion: ${mockAiScenariosLibrary[1].prompt}` 
-});
-robustEndSessionTemplate.questions.unshift({
-  id: 'dynamic-ai-1',
-  type: 'text',
-  text: `[AI Scenario 1]: ${mockAiScenariosLibrary[0].scenarioText}\n\nQuestion: ${mockAiScenariosLibrary[0].prompt}` 
-});
 
 const generateGAS = (template: any, formName: string) => {
   let code = `  function create${formName.replace(/[^A-Za-z0-9]/g, '')}() {\n`;
@@ -48,7 +35,7 @@ finalCode += `  // Copy and paste this script into Google Apps Script (script.go
 finalCode += `  // Click "Run" -> "createAllForms"\n\n`;
 
 finalCode += generateGAS(preSessionTemplate, "Leadership Executive Coaching (Q3) - What You Know");
-finalCode += generateGAS(robustEndSessionTemplate, "Leadership Executive Coaching (Q3) - What You Learnt");
+finalCode += generateGAS(endSessionTemplate, "Leadership Executive Coaching (Q3) - What You Learnt");
 finalCode += generateGAS(refresherTemplate, "Leadership Executive Coaching (Q3) - What You Did");
 
 finalCode += `  createLeadershipExecutiveCoachingQ3WhatYouKnow();\n`;
