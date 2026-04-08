@@ -101,6 +101,10 @@ export const preSessionTemplate: SurveyTemplate = {
   questions: [
     { id: '1', type: 'text', text: 'You overhear two team members having a heated argument about workload distribution in the breakroom. One is threatening to quit. What is your immediate response to this situation?' },
     { id: '2', type: 'text', text: 'A project has fallen behind schedule because two departments are refusing to share data, each blaming the other for the delay. How do you approach the department heads to resolve this deadlock?' },
+    { id: '2a', type: 'choice', text: 'What does the FAIR Model represent?', options: ['Facilitate, Appreciate, Innovate, Resolve', 'Focus, Analyze, Implement, Review', 'Facilitate, Assess, Integrate, Resolve', 'Find, Address, Innovate, Restore'] },
+    { id: '2b', type: 'choice', text: 'What is a core principle of "Structured Empathy"?', options: ['Validating emotions without validating behavior', 'Agreeing with the person\'s actions', 'Pointing out the person\'s mistakes immediately', 'Ignoring emotions to focus on facts'] },
+    { id: '2c', type: 'choice', text: 'In conflict resolution, what is the primary goal of a "Cooling-off period"?', options: ['To respect physiological boundaries and allow emotions to settle', 'To punish the parties involved', 'To avoid dealing with the conflict', 'To allow time to gather disciplinary evidence'] },
+    { id: '2d', type: 'choice', text: 'What characterizes the "Non-violent communication" methodology?', options: ['Stating observable behaviors without labels or judgments', 'Telling people exactly what they must do', 'Using labels to categorize bad attitudes', 'Forcing immediate compromises'] },
     { id: '3', type: 'text', text: 'What motivated you to attend this course?' },
     { id: '4', type: 'text', text: 'Describe a recent situation related to this course topic that you had to deal with. What did you do?' },
     { id: '5', type: 'choice', text: 'Which statement best describes your current confidence in handling situations related to this course?', options: [
@@ -187,6 +191,10 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     answers: { 
       '1': 'I would intervene quickly to stop the argument and ask them to separate to cool off before we talk privately. [AI_SCORE: 6]', 
       '2': 'I would schedule a joint meeting with both department heads and force them to map out the delays. [AI_SCORE: 5]', 
+      '2a': 'Facilitate, Appreciate, Innovate, Resolve',
+      '2b': 'Validating emotions without validating behavior',
+      '2c': 'To respect physiological boundaries and allow emotions to settle',
+      '2d': 'Telling people exactly what they must do',
       '3': 'Mandatory HR mandate', '4': 'Had a blowout with ops over scheduling.', '5': 'I often feel unsure or avoid these situations', '6': 'Handling aggressive emails', '7': 'Patience', '8': '', '9': 'No, please don\'t use', '10': ['Engage Leadership']
     }
   },
@@ -227,6 +235,10 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     answers: { 
       '1': 'I would try to mediate right there in the breakroom so they could hug it out. [AI_SCORE: 3]', 
       '2': 'I would tell my manager to handle it since it is cross-departmental. [AI_SCORE: 2]', 
+      '2a': 'Focus, Analyze, Implement, Review',
+      '2b': 'Agreeing with the person\'s actions',
+      '2c': 'To respect physiological boundaries and allow emotions to settle',
+      '2d': 'Using labels to categorize bad attitudes',
       '3': 'Wanting to improve communication', '4': 'Tried to mediate between two junior devs, went poorly.', '5': 'I manage some aspects but struggle with others', '6': 'Team meetings', '7': 'Active listening', '8': '', '9': 'Yes, happy to use', '10': ['Resolution Framework']
     }
   },
@@ -267,6 +279,10 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     answers: { 
       '1': 'I would shout at them to be professional. [AI_SCORE: 0]', 
       '2': 'I would just do the work myself so we hit the deadline. [AI_SCORE: 1]', 
+      '2a': 'Find, Address, Innovate, Restore',
+      '2b': 'Pointing out the person\'s mistakes immediately',
+      '2c': 'To punish the parties involved',
+      '2d': 'Forcing immediate compromises',
       '3': 'My manager said I need to improve how I handle team conflict.', '4': 'A team member complained about another in front of the whole office.', '5': 'I often feel unsure or avoid these situations', '6': 'All areas', '7': 'Confidence', '8': '', '9': 'No, please don\'t use', '10': []
     }
   },
@@ -307,6 +323,10 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     answers: { 
       '1': 'Pull them into a private room to understand the cause of the outburst. [AI_SCORE: 7]', 
       '2': 'Call a meeting with both sides to review the project blockers logically. [AI_SCORE: 6]', 
+      '2a': 'Focus, Analyze, Implement, Review',
+      '2b': 'Validating emotions without validating behavior',
+      '2c': 'To respect physiological boundaries and allow emotions to settle',
+      '2d': 'Telling people exactly what they must do',
       '3': 'Build confidence in difficult conversions.', '4': 'Told team member their quality was slipping.', '5': 'I often feel unsure or avoid these situations', '6': 'Giving feedback', '7': 'Frameworks', '8': '', '9': 'Yes, happy to use', '10': ['The TCM Academy']
     }
   },
@@ -347,6 +367,10 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     answers: { 
       '1': 'I would ignore it and hope it stops. [AI_SCORE: 0]', 
       '2': 'I would escalate to my director immediately. [AI_SCORE: 2]', 
+      '2a': 'Facilitate, Assess, Integrate, Resolve',
+      '2b': 'Ignoring emotions to focus on facts',
+      '2c': 'To avoid dealing with the conflict',
+      '2d': 'Using labels to categorize bad attitudes',
       '3': 'Mandatory.', '4': 'Avoided a colleague after an argument.', '5': 'I have little or no experience with these situations', '6': 'Everything', '7': 'Survival', '8': '', '9': 'No, please don\'t use', '10': []
     }
   },
