@@ -24,10 +24,6 @@ export default function InsightsTab({ session }: { session: Session }) {
   const filteredResponses = allResponses.filter(r => r.stage === stageFilter);
   const selectedResponse = filteredResponses[selectedResponseIdx] || filteredResponses[0];
 
-  const getQuestion = (stage: 'pre'|'end'|'refresher', qId: string) => {
-    return session.surveys[stage]?.questions.find(q => q.id === qId);
-  };
-
   const findRubricForQuestion = (stage: string, qId: string) => {
     const stagePrefix = stage === 'refresher' ? 'ref' : stage;
     return mockAiScenariosLibrary.find(ai => ai.id === `ai-${stagePrefix}-${qId}` || qId.startsWith(ai.id));
@@ -543,9 +539,10 @@ export default function InsightsTab({ session }: { session: Session }) {
                   </div>
                   
                   <div className="p-6 space-y-8 h-[600px] overflow-y-auto">
-                     {Object.entries(selectedResponse.answers).map(([qId, answer], index) => {
-                        const question = getQuestion(selectedResponse.stage, qId);
-                        if (!question) return null;
+                     {session.surveys[selectedResponse.stage]?.questions.map((question, index) => {
+                        const qId = question.id;
+                        const answer = selectedResponse.answers[qId];
+                        if (answer === undefined) return null;
                         
                         const aiRubric = findRubricForQuestion(selectedResponse.stage, qId);
                         const isAiQuestion = !!aiRubric; 
