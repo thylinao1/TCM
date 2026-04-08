@@ -3,6 +3,13 @@ import { mockAiScenariosLibrary } from '../data/mockData';
 import { Check, X, FileOutput, FileText, UserCircle, Sparkles, BarChart2, MessageSquare, Star, ThumbsUp, Target, TrendingUp, TrendingDown, Minus, ArrowRight } from 'lucide-react';
 import type { Session, SurveyResponse } from '../types';
 
+const MCQ_CORRECT_ANSWERS: Record<string, string> = {
+  '2a': 'Facilitate, Appreciate, Innovate, Resolve',
+  '2b': 'Validating emotions without validating behavior',
+  '2c': 'To respect physiological boundaries and allow emotions to settle',
+  '2d': 'Stating observable behaviors without labels or judgments'
+};
+
 export default function InsightsTab({ session }: { session: Session }) {
   const [activeView, setActiveView] = useState<'overview' | 'responses' | 'progress'>('overview');
   const [stageFilter, setStageFilter] = useState<'pre' | 'end' | 'refresher'>('end');
@@ -76,12 +83,19 @@ export default function InsightsTab({ session }: { session: Session }) {
       const q = survey?.questions.find(x => x.id === qId);
       if (!q) return;
 
-      const isEvaluation = typeof val === 'string' && val.includes('[AI_SCORE:');
-      if (isEvaluation) {
-        const s = getScore(val);
-        if (s !== null) {
-          earned += s;
-          possible += 10; 
+      if (q.type === 'choice' && MCQ_CORRECT_ANSWERS[qId]) {
+        possible += 5;
+        if (val === MCQ_CORRECT_ANSWERS[qId]) {
+          earned += 5;
+        }
+      } else {
+        const isEvaluation = typeof val === 'string' && val.includes('[AI_SCORE:');
+        if (isEvaluation) {
+          const s = getScore(val as string);
+          if (s !== null) {
+            earned += s;
+            possible += 10; 
+          }
         }
       }
     });
@@ -546,6 +560,12 @@ export default function InsightsTab({ session }: { session: Session }) {
                                <div className="flex-1">
                                  {Array.isArray(answer) ? answer.join(', ') : answer.replace(/\[AI_SCORE:\s*\d+\]/g, '')}
                                </div>
+                               {question.type === 'choice' && MCQ_CORRECT_ANSWERS[qId] && (
+                                 <div className={`shrink-0 font-bold px-3 py-1.5 rounded-lg border shadow-sm text-xs flex flex-col items-center ${answer === MCQ_CORRECT_ANSWERS[qId] ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-red-100 text-red-700 border-red-200'}`}>
+                                   <span className="opacity-75 text-[9px] uppercase tracking-wider mb-0.5">Score</span>
+                                   <div className="text-base">{answer === MCQ_CORRECT_ANSWERS[qId] ? '5' : '0'}<span className="text-[10px] opacity-75 font-medium"> / 5</span></div>
+                                 </div>
+                               )}
                                {typeof answer === 'string' && answer.includes('[AI_SCORE:') && (
                                  <div className="shrink-0 bg-indigo-100 text-indigo-700 font-bold px-3 py-1.5 rounded-lg border border-indigo-200 shadow-sm text-xs flex flex-col items-center">
                                    <span className="opacity-75 text-[9px] uppercase tracking-wider mb-0.5">AI Grade</span>

@@ -197,6 +197,10 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     answers: { 
       '1': 'I would allow them to leave, wait an hour, and then follow up with them privately to discuss what triggered them. [AI_SCORE: 10]', 
       '2': 'I would use the structured empathy framework, first acknowledging their drive, then stating the impact of their interruptions. [AI_SCORE: 10]', 
+      '2a': 'Facilitate, Appreciate, Innovate, Resolve',
+      '2b': 'Validating emotions without validating behavior',
+      '2c': 'To respect physiological boundaries and allow emotions to settle',
+      '2d': 'Stating observable behaviors without labels or judgments',
       '3': 'The structured empathy mechanism.', '4': 'I will hold weekly 1-on-1s without an agenda.', '5': 'I can confidently apply the tools in real situations', '6': 'I demonstrated the behaviors effectively', '7': 'Better team cohesion.', '8': 'More breaks.', '9': 'Yes', '10': 'I feel transformed.', '11': 'Yes, happy to use', '12': ['The Investigation Company'], '13': '5'
     }
   },
@@ -207,6 +211,10 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     answers: { 
       '1': 'I noticed two designers getting short with each other on Slack, so I jumped in a quick huddle with them both to realign. [AI_SCORE: 10]', 
       '2': 'I helped resolve a dispute between QA and dev by establishing ground rules. They eventually compromised. [AI_SCORE: 10]', 
+      '2a': 'Facilitate, Appreciate, Innovate, Resolve',
+      '2b': 'Validating emotions without validating behavior',
+      '2c': 'To respect physiological boundaries and allow emotions to settle',
+      '2d': 'Stating observable behaviors without labels or judgments',
       '3': 'Used framework to handle QA disputes.', '4': 'A dev threatened to quit, I used open questions instead of getting defensive.', '5': 'Hard to remember the framework steps when stressed.', '6': 'I count to 3 before responding.', '7': 'Manager support.', '8': '', '9': 'Yes', '10': '', '11': 'Yes, happy to use', '12': []
     }
   },
@@ -261,6 +269,10 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     answers: { 
       '1': 'I would inform HR that the mediation failed and give up on the process. [AI_SCORE: 2]', 
       '2': 'I would call them out in the next team meeting to set an example. [AI_SCORE: 0]', 
+      '2a': 'Focus, Analyze, Implement, Review',
+      '2b': 'Agreeing with the person\'s actions',
+      '2c': 'To punish the parties involved',
+      '2d': 'Telling people exactly what they must do',
       '3': 'Conflict triangles.', '4': 'I will be more direct.', '5': 'I can apply some tools but would like more practice', '6': 'I partially demonstrated them and know what to improve', '7': 'Less drama.', '8': 'Shorter days.', '9': 'Maybe', '10': '', '11': 'Yes, happy to use', '12': [], '13': '3'
     }
   },
@@ -271,6 +283,10 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     answers: { 
       '1': 'I saw tension and just assigned them to different projects. [AI_SCORE: 4]', 
       '2': 'I tried using structured empathy but ended up just telling them the solution. [AI_SCORE: 4]', 
+      '2a': 'Focus, Analyze, Implement, Review',
+      '2b': 'Ignoring emotions to focus on facts',
+      '2c': 'To avoid dealing with the conflict',
+      '2d': 'Using labels to categorize bad attitudes',
       '3': 'Issues over remote chat.', '4': 'Tried to use the email templates for conflict.', '5': 'Takes too long to do proper mediation.', '6': 'Delegating the HR matters quicker.', '7': 'None really.', '8': '', '9': 'Maybe', '10': '', '11': 'No, please don\'t use', '12': []
     }
   },
