@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { mockAiScenariosLibrary } from '../data/mockData';
 import { Check, X, FileOutput, FileText, UserCircle, Sparkles, BarChart2, MessageSquare, Star, ThumbsUp, Target, TrendingUp, TrendingDown, Minus, ArrowRight } from 'lucide-react';
-import type { Session, SurveyResponse } from '../types';
+import type { Session, SurveyResponse, FeedbackScenario } from '../types';
+import { scoreResponseWithAI } from '../lib/aiScoring';
+import type { AiScoreResult } from '../lib/scoringSchema';
 
 const MCQ_CORRECT_ANSWERS: Record<string, string> = {
   '2a': 'Facilitate, Appreciate, Innovate, Resolve',
@@ -17,6 +19,11 @@ export default function InsightsTab({ session }: { session: Session }) {
 
   const [allResponses, setAllResponses] = useState(session.responses || []);
 
+  // --- Live AI scoring state (calls the /api/score LLM endpoint) ---
+  const [scoringKey, setScoringKey] = useState<string | null>(null);
+  const [scoreError, setScoreError] = useState<{ key: string; message: string } | null>(null);
+  const [aiDetails, setAiDetails] = useState<Record<string, AiScoreResult>>({});
+
   useEffect(() => {
     setAllResponses(session.responses || []);
   }, [session.responses]);
@@ -27,6 +34,31 @@ export default function InsightsTab({ session }: { session: Session }) {
   const findRubricForQuestion = (stage: string, qId: string) => {
     const stagePrefix = stage === 'refresher' ? 'ref' : stage;
     return mockAiScenariosLibrary.find(ai => ai.id === `ai-${stagePrefix}-${qId}` || qId.startsWith(ai.id));
+  };
+
+  // Sends one open-ended answer to the /api/score endpoint for a real LLM
+  // scoring pass, then writes the validated 0-10 score back into the response.
+  const handleAiScore = async (qId: string, scenario: FeedbackScenario, rawAnswer: string) => {
+    if (!selectedResponse) return;
+    const key = `${selectedResponse.id}:${qId}`;
+    setScoringKey(key);
+    setScoreError(null);
+    try {
+      const learnerResponse = rawAnswer.replace(/\[AI_SCORE:\s*\d+\]/g, '').trim();
+      if (!learnerResponse) throw new Error('This response is empty — there is nothing to score.');
+      const result = await scoreResponseWithAI({ scenario, learnerResponse });
+      setAiDetails(prev => ({ ...prev, [key]: result }));
+      setAllResponses(prev => prev.map(r => {
+        if (r.id !== selectedResponse.id) return r;
+        const current = (r.answers[qId] as string) ?? '';
+        const cleaned = current.replace(/\s*\[AI_SCORE:\s*\d+\]/g, '').trim();
+        return { ...r, answers: { ...r.answers, [qId]: `${cleaned} [AI_SCORE: ${result.score}]` } };
+      }));
+    } catch (err) {
+      setScoreError({ key, message: err instanceof Error ? err.message : 'Scoring failed.' });
+    } finally {
+      setScoringKey(null);
+    }
   };
 
   // --- AGGREGATION LOGIC ---
@@ -545,7 +577,9 @@ export default function InsightsTab({ session }: { session: Session }) {
                         if (answer === undefined) return null;
                         
                         const aiRubric = findRubricForQuestion(selectedResponse.stage, qId);
-                        const isAiQuestion = !!aiRubric; 
+                        const isAiQuestion = !!aiRubric;
+                        const rowKey = `${selectedResponse.id}:${qId}`;
+                        const aiDetail = aiDetails[rowKey];
 
                         return (
                           <div key={qId} className={`relative p-5 rounded-2xl border ${isAiQuestion ? 'border-indigo-200 bg-indigo-50/20' : 'border-slate-100 bg-slate-50/50'}`}>
@@ -600,10 +634,24 @@ export default function InsightsTab({ session }: { session: Session }) {
 
                              {isAiQuestion && (
                                <div className="mt-4 pt-4 border-t border-indigo-100">
-                                 <div className="flex items-center justify-between mb-3">
+                                 <div className="flex items-center justify-between mb-3 gap-2">
                                    <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">AI Evaluation Rubric (Trainer Adjustable)</h4>
-                                   <button className="text-[10px] text-indigo-600 font-bold hover:bg-indigo-100 uppercase tracking-wider bg-indigo-50 px-2.5 py-1.5 rounded transition-colors">Save Adjustments</button>
+                                   <div className="flex items-center gap-2 shrink-0">
+                                     <button
+                                       type="button"
+                                       onClick={() => handleAiScore(qId, aiRubric, typeof answer === 'string' ? answer : '')}
+                                       disabled={scoringKey === rowKey}
+                                       className="text-[10px] text-white font-bold uppercase tracking-wider bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 px-2.5 py-1.5 rounded transition-colors flex items-center gap-1.5"
+                                     >
+                                       <Sparkles size={11} className={scoringKey === rowKey ? 'animate-pulse' : ''} />
+                                       {scoringKey === rowKey ? 'Scoring…' : 'Score with AI'}
+                                     </button>
+                                     <button type="button" className="text-[10px] text-indigo-600 font-bold hover:bg-indigo-100 uppercase tracking-wider bg-indigo-50 px-2.5 py-1.5 rounded transition-colors">Save Adjustments</button>
+                                   </div>
                                  </div>
+                                 {scoreError && scoreError.key === rowKey && (
+                                   <p className="text-[11px] text-rose-600 font-medium mb-3 bg-rose-50 border border-rose-100 rounded-lg px-3 py-2">{scoreError.message}</p>
+                                 )}
                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                    <div className="space-y-3">
                                      {aiRubric.rubric.map((r, i) => {
@@ -628,6 +676,27 @@ export default function InsightsTab({ session }: { session: Session }) {
                                       </ul>
                                    </div>
                                  </div>
+
+                                 {aiDetail && (
+                                   <div className="mt-4 bg-indigo-950 rounded-xl p-4 text-indigo-50">
+                                     <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                       <Sparkles size={14} className="text-indigo-300" />
+                                       <h5 className="text-xs font-bold uppercase tracking-wider">Live AI Score — {aiDetail.score} / 10</h5>
+                                       <span className="text-[9px] font-semibold uppercase tracking-wider bg-indigo-700/60 text-indigo-100 px-1.5 py-0.5 rounded">{aiDetail.targetTier}</span>
+                                     </div>
+                                     <p className="text-xs leading-relaxed text-indigo-100 mb-3">{aiDetail.justification}</p>
+                                     <ul className="space-y-1.5">
+                                       {aiDetail.criteria.map((c, i) => (
+                                         <li key={i} className="flex items-start gap-2 text-[11px]">
+                                           {c.met
+                                             ? <Check size={13} className={`shrink-0 mt-0.5 ${c.type === 'success' ? 'text-emerald-400' : 'text-rose-400'}`} />
+                                             : <X size={13} className="shrink-0 mt-0.5 text-slate-500" />}
+                                           <span className="text-indigo-100"><span className="font-semibold">{c.criterion}</span>{c.evidence ? ` — ${c.evidence}` : ''}</span>
+                                         </li>
+                                       ))}
+                                     </ul>
+                                   </div>
+                                 )}
                                </div>
                              )}
                           </div>
