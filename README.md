@@ -88,4 +88,5 @@ src/
   lib/              scoringSchema.ts (zod), aiScoring.ts (client)
   data/             survey templates + mock data
 supabase/         Postgres schema
+generate_gas.ts   generator for the Google Forms survey scripts
 ```
