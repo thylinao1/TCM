@@ -6,6 +6,7 @@ import {
   bias,
   pearson,
   spearman,
+  linearFit,
 } from './metrics';
 
 describe('meanAbsoluteError', () => {
@@ -56,5 +57,18 @@ describe('spearman', () => {
   });
   it('handles tied values', () => {
     expect(spearman([1, 1, 2], [5, 5, 9])).toBeCloseTo(1);
+  });
+});
+
+describe('linearFit', () => {
+  it('recovers the slope and intercept of a perfect line', () => {
+    const fit = linearFit([0, 1, 2, 3], [1, 3, 5, 7]); // y = 2x + 1
+    expect(fit.slope).toBeCloseTo(2);
+    expect(fit.intercept).toBeCloseTo(1);
+  });
+  it('recovers a pure constant offset', () => {
+    const fit = linearFit([1, 2, 3], [3, 4, 5]); // y = x + 2
+    expect(fit.slope).toBeCloseTo(1);
+    expect(fit.intercept).toBeCloseTo(2);
   });
 });

@@ -12,6 +12,7 @@ import {
   bias,
   pearson,
   spearman,
+  linearFit,
 } from './metrics';
 
 /**
@@ -71,10 +72,19 @@ function pct(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
 }
 
+interface Calibration {
+  slope: number;
+  intercept: number;
+  mae: number;
+  within1: number;
+  within2: number;
+}
+
 function buildReport(
   model: string,
   rows: Array<GoldItem & { aiScore: number }>,
   metrics: Record<string, number>,
+  calibration: Calibration,
 ): string {
   const lines: string[] = [];
   lines.push('# LLM Scorer Evaluation Report');
@@ -94,6 +104,19 @@ function buildReport(
   lines.push(`| Bias (AI − human) | ${metrics.bias >= 0 ? '+' : ''}${metrics.bias.toFixed(2)} points |`);
   lines.push(`| Pearson correlation | ${metrics.pearson.toFixed(3)} |`);
   lines.push(`| Spearman correlation | ${metrics.spearman.toFixed(3)} |`);
+  lines.push('');
+  lines.push('## After leave-one-out linear calibration');
+  lines.push('');
+  lines.push(
+    `Fitted calibration: \`human ≈ ${calibration.slope.toFixed(3)} × ai + ${calibration.intercept.toFixed(3)}\`. ` +
+      'Metrics below are leave-one-out cross-validated, so the calibration is never evaluated on the point it was fitted with.',
+  );
+  lines.push('');
+  lines.push('| Metric | Value |');
+  lines.push('| --- | --- |');
+  lines.push(`| Calibrated mean absolute error | ${calibration.mae.toFixed(2)} points |`);
+  lines.push(`| Calibrated within ±1 accuracy | ${pct(calibration.within1)} |`);
+  lines.push(`| Calibrated within ±2 accuracy | ${pct(calibration.within2)} |`);
   lines.push('');
   lines.push('## Per-response results');
   lines.push('');
@@ -150,6 +173,26 @@ async function main(): Promise<void> {
     spearman: spearman(aiScores, humanScores),
   };
 
+  // Leave-one-out cross-validated linear calibration. The raw AI scores
+  // correlate strongly with the human scores but carry a systematic offset;
+  // fitting `human ~= slope * ai + intercept` corrects it. Leave-one-out CV
+  // ensures the calibration is never evaluated on the point it was fit with.
+  const calibrationFit = linearFit(aiScores, humanScores);
+  const calibratedScores: number[] = [];
+  for (let i = 0; i < aiScores.length; i++) {
+    const trainAi = aiScores.filter((_, j) => j !== i);
+    const trainHuman = humanScores.filter((_, j) => j !== i);
+    const fit = linearFit(trainAi, trainHuman);
+    calibratedScores.push(fit.slope * aiScores[i] + fit.intercept);
+  }
+  const calibration: Calibration = {
+    slope: calibrationFit.slope,
+    intercept: calibrationFit.intercept,
+    mae: meanAbsoluteError(calibratedScores, humanScores),
+    within1: withinToleranceAccuracy(calibratedScores, humanScores, 1),
+    within2: withinToleranceAccuracy(calibratedScores, humanScores, 2),
+  };
+
   console.log('\n=== Agreement with human reference scores ===');
   console.log(`  Exact-match accuracy : ${pct(metrics.exact)}`);
   console.log(`  Within ±1 accuracy   : ${pct(metrics.within1)}`);
@@ -159,7 +202,15 @@ async function main(): Promise<void> {
   console.log(`  Pearson correlation  : ${metrics.pearson.toFixed(3)}`);
   console.log(`  Spearman correlation : ${metrics.spearman.toFixed(3)}`);
 
-  writeFileSync('eval/results.md', buildReport(DEFAULT_MODEL, rows, metrics));
+  console.log('\n=== After leave-one-out linear calibration ===');
+  console.log(
+    `  Calibration          : human ~= ${calibration.slope.toFixed(3)} x ai + ${calibration.intercept.toFixed(3)}`,
+  );
+  console.log(`  Calibrated MAE       : ${calibration.mae.toFixed(2)} points`);
+  console.log(`  Calibrated within +/-1: ${pct(calibration.within1)}`);
+  console.log(`  Calibrated within +/-2: ${pct(calibration.within2)}`);
+
+  writeFileSync('eval/results.md', buildReport(DEFAULT_MODEL, rows, metrics, calibration));
   console.log('\nReport written to eval/results.md');
 }
 

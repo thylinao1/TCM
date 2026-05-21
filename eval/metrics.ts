@@ -74,3 +74,22 @@ function ranks(values: number[]): number[] {
 export function spearman(a: number[], b: number[]): number {
   return pearson(ranks(a), ranks(b));
 }
+
+/**
+ * Ordinary-least-squares fit of `y ≈ slope * x + intercept`.
+ * Used to calibrate the AI scores against the human reference scores.
+ */
+export function linearFit(x: number[], y: number[]): { slope: number; intercept: number } {
+  const n = x.length;
+  if (n === 0) return { slope: 0, intercept: 0 };
+  const meanX = x.reduce((s, v) => s + v, 0) / n;
+  const meanY = y.reduce((s, v) => s + v, 0) / n;
+  let covariance = 0;
+  let varianceX = 0;
+  for (let i = 0; i < n; i++) {
+    covariance += (x[i] - meanX) * (y[i] - meanY);
+    varianceX += (x[i] - meanX) ** 2;
+  }
+  const slope = varianceX === 0 ? 0 : covariance / varianceX;
+  return { slope, intercept: meanY - slope * meanX };
+}

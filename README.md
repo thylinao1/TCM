@@ -43,8 +43,10 @@ Score with AI  (src/lib/aiScoring.ts)
 `npm run eval` measures how closely the AI scorer agrees with human reference
 scores. It runs the production scoring engine over a gold set of human-scored
 responses and reports exact-match accuracy, within-±1 accuracy, mean absolute
-error, bias, and Pearson/Spearman correlation. The report is written to
-`eval/results.md`.
+error, bias, and Pearson/Spearman correlation. Because the model ranks answers
+well but scores with a systematic offset, the harness also fits a
+leave-one-out cross-validated linear calibration and reports the corrected
+agreement. The report is written to `eval/results.md`.
 
 ## Tech stack
 

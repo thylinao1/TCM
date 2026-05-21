@@ -189,8 +189,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     participantName: 'Alex Stanton', participantEmail: 'astanton@globex.com',
     submittedAt: new Date(Date.now() - 31 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
-      '1': 'I would intervene quickly to stop the argument and ask them to separate to cool off before we talk privately. [AI_SCORE: 6]', 
-      '2': 'I would schedule a joint meeting with both department heads and force them to map out the delays. [AI_SCORE: 5]', 
+      '1': 'I would intervene quickly to stop the argument and ask them to separate to cool off before we talk privately. [AI_SCORE: 7]', 
+      '2': 'I would schedule a joint meeting with both department heads and force them to map out the delays. [AI_SCORE: 6]', 
       '2a': 'Facilitate, Appreciate, Innovate, Resolve',
       '2b': 'Validating emotions without validating behavior',
       '2c': 'To respect physiological boundaries and allow emotions to settle',
@@ -203,8 +203,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     participantName: 'Alex Stanton', participantEmail: 'astanton@globex.com',
     submittedAt: new Date(Date.now() - 29 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
-      '1': 'I would allow them to leave, wait an hour, and then follow up with them privately to discuss what triggered them. [AI_SCORE: 10]', 
-      '2': 'I would use the structured empathy framework, first acknowledging their drive, then stating the impact of their interruptions. [AI_SCORE: 10]', 
+      '1': 'I would allow them to leave, wait an hour, and then follow up with them privately to discuss what triggered them. [AI_SCORE: 9]', 
+      '2': 'I would use the structured empathy framework, first acknowledging their drive, then stating the impact of their interruptions. [AI_SCORE: 7]', 
       '2a': 'Facilitate, Appreciate, Innovate, Resolve',
       '2b': 'Validating emotions without validating behavior',
       '2c': 'To respect physiological boundaries and allow emotions to settle',
@@ -217,8 +217,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     participantName: 'Alex Stanton', participantEmail: 'astanton@globex.com',
     submittedAt: new Date().toISOString(),
     answers: { 
-      '1': 'I noticed two designers getting short with each other on Slack, so I jumped in a quick huddle with them both to realign. [AI_SCORE: 10]', 
-      '2': 'I helped resolve a dispute between QA and dev by establishing ground rules. They eventually compromised. [AI_SCORE: 10]', 
+      '1': 'I noticed two designers getting short with each other on Slack, so I jumped in a quick huddle with them both to realign. [AI_SCORE: 8]', 
+      '2': 'I helped resolve a dispute between QA and dev by establishing ground rules. They eventually compromised. [AI_SCORE: 6]', 
       '2a': 'Facilitate, Appreciate, Innovate, Resolve',
       '2b': 'Validating emotions without validating behavior',
       '2c': 'To respect physiological boundaries and allow emotions to settle',
@@ -234,7 +234,7 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     submittedAt: new Date(Date.now() - 32 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
       '1': 'I would try to mediate right there in the breakroom so they could hug it out. [AI_SCORE: 3]', 
-      '2': 'I would tell my manager to handle it since it is cross-departmental. [AI_SCORE: 2]', 
+      '2': 'I would tell my manager to handle it since it is cross-departmental. [AI_SCORE: 3]', 
       '2a': 'Focus, Analyze, Implement, Review',
       '2b': 'Agreeing with the person\'s actions',
       '2c': 'To respect physiological boundaries and allow emotions to settle',
@@ -247,8 +247,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     participantName: 'Mia Rojas', participantEmail: 'mia.rojas@acme.corp',
     submittedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
-      '1': 'I would follow them immediately to ensure they were okay and demand they return to the mediation. [AI_SCORE: 4]', 
-      '2': 'I would document their behavior, invite them to my office, and issue a formal warning right away. [AI_SCORE: 5]', 
+      '1': 'I would follow them immediately to ensure they were okay and demand they return to the mediation. [AI_SCORE: 3]', 
+      '2': 'I would document their behavior, invite them to my office, and issue a formal warning right away. [AI_SCORE: 3]', 
       '2a': 'Facilitate, Appreciate, Innovate, Resolve',
       '2b': 'Agreeing with the person\'s actions',
       '2c': 'To respect physiological boundaries and allow emotions to settle',
@@ -261,8 +261,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     participantName: 'Mia Rojas', participantEmail: 'mia.rojas@acme.corp',
     submittedAt: new Date().toISOString(),
     answers: { 
-      '1': 'I caught an email chain getting hostile and transitioned it to a phone call before it blew up. [AI_SCORE: 10]', 
-      '2': 'Booked an unhurried conversation with Liam to genuinely ask how he is. Everything went smooth. [AI_SCORE: 10]', 
+      '1': 'I caught an email chain getting hostile and transitioned it to a phone call before it blew up. [AI_SCORE: 7]', 
+      '2': 'Booked an unhurried conversation with Liam to genuinely ask how he is. Everything went smooth. [AI_SCORE: 5]', 
       '2a': 'Facilitate, Appreciate, Innovate, Resolve',
       '2b': 'Agreeing with the person\'s actions',
       '2c': 'To respect physiological boundaries and allow emotions to settle',
@@ -277,8 +277,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     participantName: 'David Chen', participantEmail: 'dchen@acme.corp',
     submittedAt: new Date(Date.now() - 33 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
-      '1': 'I would shout at them to be professional. [AI_SCORE: 0]', 
-      '2': 'I would just do the work myself so we hit the deadline. [AI_SCORE: 1]', 
+      '1': 'I would shout at them to be professional. [AI_SCORE: 2]', 
+      '2': 'I would just do the work myself so we hit the deadline. [AI_SCORE: 2]', 
       '2a': 'Find, Address, Innovate, Restore',
       '2b': 'Pointing out the person\'s mistakes immediately',
       '2c': 'To punish the parties involved',
@@ -292,7 +292,7 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     submittedAt: new Date(Date.now() - 29 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
       '1': 'I would inform HR that the mediation failed and give up on the process. [AI_SCORE: 2]', 
-      '2': 'I would call them out in the next team meeting to set an example. [AI_SCORE: 0]', 
+      '2': 'I would call them out in the next team meeting to set an example. [AI_SCORE: 2]', 
       '2a': 'Focus, Analyze, Implement, Review',
       '2b': 'Agreeing with the person\'s actions',
       '2c': 'To punish the parties involved',
@@ -335,8 +335,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     participantName: 'Sam Wilson', participantEmail: 'samw@acme.corp',
     submittedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
-      '1': 'Respect their boundary, then reach out later expressing empathy and offering to reschedule. [AI_SCORE: 10]', 
-      '2': 'Share specific observations of the interruptions, ask for their perspective, and co-create ground rules. [AI_SCORE: 10]', 
+      '1': 'Respect their boundary, then reach out later expressing empathy and offering to reschedule. [AI_SCORE: 8]', 
+      '2': 'Share specific observations of the interruptions, ask for their perspective, and co-create ground rules. [AI_SCORE: 9]', 
       '2a': 'Facilitate, Appreciate, Innovate, Resolve',
       '2b': 'Validating emotions without validating behavior',
       '2c': 'To respect physiological boundaries and allow emotions to settle',
@@ -349,8 +349,8 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     participantName: 'Sam Wilson', participantEmail: 'samw@acme.corp',
     submittedAt: new Date().toISOString(),
     answers: { 
-      '1': 'Saw passive-aggressive behavior and intervened with a neutral check-in question. [AI_SCORE: 10]', 
-      '2': 'Used the framework step by step on a junior staff dispute, leading to mutual understanding. [AI_SCORE: 10]', 
+      '1': 'Saw passive-aggressive behavior and intervened with a neutral check-in question. [AI_SCORE: 7]', 
+      '2': 'Used the framework step by step on a junior staff dispute, leading to mutual understanding. [AI_SCORE: 7]', 
       '2a': 'Facilitate, Appreciate, Innovate, Resolve',
       '2b': 'Validating emotions without validating behavior',
       '2c': 'To respect physiological boundaries and allow emotions to settle',
@@ -365,7 +365,7 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     participantName: 'Jordan Lee', participantEmail: 'jlee@acme.corp',
     submittedAt: new Date(Date.now() - 33 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
-      '1': 'I would ignore it and hope it stops. [AI_SCORE: 0]', 
+      '1': 'I would ignore it and hope it stops. [AI_SCORE: 2]', 
       '2': 'I would escalate to my director immediately. [AI_SCORE: 2]', 
       '2a': 'Facilitate, Assess, Integrate, Resolve',
       '2b': 'Ignoring emotions to focus on facts',
@@ -380,7 +380,7 @@ export const mockPopulatedResponses: SurveyResponse[] = [
     submittedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
     answers: { 
       '1': 'I would be confused and wait for them to contact me. [AI_SCORE: 3]', 
-      '2': 'Ask one of her closer colleagues to talk to her to avoid putting her on the spot. [AI_SCORE: 0]', 
+      '2': 'Ask one of her closer colleagues to talk to her to avoid putting her on the spot. [AI_SCORE: 3]', 
       '2a': 'Focus, Analyze, Implement, Review',
       '2b': 'Agreeing with the person\'s actions',
       '2c': 'To punish the parties involved',
