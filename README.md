@@ -1,4 +1,4 @@
-# Blue Morning — LTEM Training Evaluation Platform
+# Blue Morning - LTEM Training Evaluation Platform
 
 A web platform that operationalises the **Learning-Transfer Evaluation Model
 (LTEM)** for The TCM Group. Trainers run a three-stage evaluation journey for
@@ -35,7 +35,7 @@ Score with AI  (src/lib/aiScoring.ts)
 - The model is prompted with the scenario's Success/Fail rubric criteria and
   asked to return JSON.
 - The response is validated against a zod schema; invalid output is retried
-  once, then rejected — the UI never displays unvalidated model output.
+  once, then rejected; the UI never displays unvalidated model output.
 - `OPENAI_SCORING_MODEL` overrides the model (default `gpt-4o-mini`).
 
 ## Evaluation harness
