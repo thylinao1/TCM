@@ -110,13 +110,13 @@ export default function EvaluationReport({ session }: { session: Session }) {
           roughly symmetric, mound-shaped pattern allows the paired t-test; a lopsided
           pattern calls for the Wilcoxon test instead.
         </p>
-        <div className="flex items-end gap-2 h-40 mb-2">
+        <div className="flex items-end gap-2 h-44 mb-2">
           {r.histogram.map((b) => (
-            <div key={b.label} className="flex-1 flex flex-col items-center gap-1">
+            <div key={b.label} className="flex-1 h-full flex flex-col justify-end items-center gap-1">
               <span className="text-xs font-bold text-slate-500">{b.count}</span>
               <div
                 className="w-full bg-gradient-to-t from-indigo-600 to-indigo-400 rounded-t-md transition-all duration-700"
-                style={{ height: `${(b.count / maxBin) * 100}%` }}
+                style={{ height: `${Math.max((b.count / maxBin) * 88, b.count > 0 ? 4 : 0)}%` }}
               />
             </div>
           ))}
