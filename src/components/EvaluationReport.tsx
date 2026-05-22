@@ -106,9 +106,10 @@ export default function EvaluationReport({ session }: { session: Session }) {
       {/* ============ DISTRIBUTION CHECK ============ */}
       <Section icon={<BarChart3 size={18} />} title="Distribution check" subtitle="Which statistical test applies">
         <p className="text-sm text-slate-600 leading-relaxed mb-5">
-          Before choosing a test, the platform inspects the shape of the gain scores. A
-          roughly symmetric, mound-shaped pattern allows the paired t-test; a lopsided
-          pattern calls for the Wilcoxon test instead.
+          Before choosing a test, the platform inspects the shape of the gain scores. It
+          plots them as a histogram and runs a formal Shapiro-Wilk normality test. A
+          roughly symmetric, mound-shaped pattern that passes the test allows the paired
+          t-test; otherwise the Wilcoxon test is used instead.
         </p>
         <div className="flex items-end gap-2 h-44 mb-2">
           {r.histogram.map((b) => (
@@ -129,9 +130,17 @@ export default function EvaluationReport({ session }: { session: Session }) {
           ))}
         </div>
         <p className="text-center text-xs text-slate-400 mt-1">Gain score (points improved, post minus pre)</p>
-        <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <MiniStat label="Skewness" value={r.skew.toFixed(2)} />
-          <MiniStat label="Distribution" value={r.isNormal ? 'Approx. normal' : 'Skewed'} />
+        <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <MiniStat label="Shapiro-Wilk W" value={r.shapiroW.toFixed(3)} />
+          <MiniStat
+            label="Normality test p-value"
+            value={r.shapiroP < 0.001 ? '< 0.001' : r.shapiroP.toFixed(3)}
+          />
+          <MiniStat
+            label="Distribution"
+            value={r.isNormal ? 'Approx. normal' : 'Not normal'}
+            highlight={r.isNormal}
+          />
           <MiniStat label="Sample size" value={String(r.matched)} />
         </div>
         <div className="mt-4 bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-start gap-3">

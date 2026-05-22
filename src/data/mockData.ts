@@ -426,7 +426,9 @@ const rng = mulberry32(20260410);
 const gauss = (m: number, s: number) =>
   m + (s / 0.5774) * (rng() + rng() + rng() + rng() - 2);
 const clamp = (x: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, x));
-const scoreInt = (x: number) => Math.round(clamp(x, 0, 10));
+// AI rubric scores carry one decimal place, so the decision-making score
+// (the mean of two scenario questions) is effectively continuous.
+const score1dp = (x: number) => Math.round(clamp(x, 0, 10) * 10) / 10;
 
 const generatedNames = [
   'Priya Nair', 'Tom Whitfield', 'Grace Adeyemi', 'Daniel Okonkwo',
@@ -434,7 +436,15 @@ const generatedNames = [
   'Sofia Marchetti', 'Liam Donnelly', 'Chloe Bennett', 'Raj Patel',
   'Emma Lindqvist', 'Noah Carter', 'Yusuf Demir', 'Isabel Cruz',
   'Ben Harrington', 'Maya Goldberg', 'Connor Walsh', 'Freya Nilsson',
-  'Adam Saunders',
+  'Adam Saunders', 'Leila Hassan', 'George Mensah', 'Ruby Fletcher',
+  'Arjun Mehta', 'Nina Kowalski', 'Patrick Byrne', 'Zoe Armstrong',
+  'Felix Bauer', 'Amara Eze', 'Sean Gallagher', 'Tara Sullivan',
+  'Hugo Laurent', 'Bianca Rossi', 'Dylan Pierce', 'Esther Cohen',
+  'Marco Silva', 'Jasmine Wong', 'Callum Reid', 'Lara Petrova',
+  'Ethan Hayes', 'Naomi Clarke', 'Simon Frost', 'Priscilla Owusu',
+  'Theo Vance', 'Wendy Zhang', 'Idris Mohammed', 'Carla Jimenez',
+  'Robert Nash', 'Anna Kovac', 'Joel Ferreira', 'Megan Doyle',
+  'Victor Lindholm', 'Sara Haddad', 'Nathan Pryce',
 ];
 
 const MCQ_BANK: Record<string, { correct: string; wrong: string[] }> = {
@@ -472,18 +482,18 @@ const answerLine = (band: number): string => {
 const generatedCohort: SurveyResponse[] = [];
 generatedNames.forEach((name, i) => {
   const email = name.toLowerCase().replace(/[^a-z]+/g, '.') + '@acme.corp';
-  const preMean = clamp(gauss(2.6, 1.3), 0, 6);
-  const gain = clamp(gauss(3.7, 2.3), -1.5, 7);
-  const endMean = clamp(preMean + gain, 0.6, 9.4);
-  const refMean = clamp(endMean - gauss(0.6, 1.1), 0.6, 9.4);
+  const preMean = clamp(gauss(2.8, 1.05), 0.5, 6);
+  const gain = clamp(gauss(3.0, 1.85), -1.0, 7.5);
+  const endMean = clamp(preMean + gain, 0.6, 9.3);
+  const refMean = clamp(endMean - gauss(0.7, 1.0), 0.6, 9.3);
 
   const stageBlock = (
     stage: 'pre' | 'end' | 'refresher',
     sMean: number,
     daysAgo: number,
   ): SurveyResponse => {
-    const q1 = scoreInt(sMean + gauss(0, 0.9));
-    const q2 = scoreInt(sMean + gauss(0, 0.9));
+    const q1 = score1dp(sMean + gauss(0, 0.7));
+    const q2 = score1dp(sMean + gauss(0, 0.7));
     const pCorrect = clamp(0.15 + sMean / 12, 0.1, 0.95);
     const answers: Record<string, string | string[]> = {
       '1': `${answerLine(q1)} [AI_SCORE: ${q1}]`,

@@ -44,14 +44,14 @@ export default function InsightsTab({ session }: { session: Session }) {
     setScoringKey(key);
     setScoreError(null);
     try {
-      const learnerResponse = rawAnswer.replace(/\[AI_SCORE:\s*\d+\]/g, '').trim();
+      const learnerResponse = rawAnswer.replace(/\[AI_SCORE:\s*\d+(?:\.\d+)?\]/g, '').trim();
       if (!learnerResponse) throw new Error('This response is empty — there is nothing to score.');
       const result = await scoreResponseWithAI({ scenario, learnerResponse });
       setAiDetails(prev => ({ ...prev, [key]: result }));
       setAllResponses(prev => prev.map(r => {
         if (r.id !== selectedResponse.id) return r;
         const current = (r.answers[qId] as string) ?? '';
-        const cleaned = current.replace(/\s*\[AI_SCORE:\s*\d+\]/g, '').trim();
+        const cleaned = current.replace(/\s*\[AI_SCORE:\s*\d+(?:\.\d+)?\]/g, '').trim();
         return { ...r, answers: { ...r.answers, [qId]: `${cleaned} [AI_SCORE: ${result.score}]` } };
       }));
     } catch (err) {
@@ -98,8 +98,8 @@ export default function InsightsTab({ session }: { session: Session }) {
   // --- LTEM 5 ASSESSMENT SCORING LOGIC ---
   const getScore = (answer: string | string[]): number | null => {
     if (typeof answer !== 'string') return null;
-    const match = answer.match(/\[AI_SCORE:\s*(\d+)\]/);
-    return match ? parseInt(match[1], 10) : null;
+    const match = answer.match(/\[AI_SCORE:\s*(\d+(?:\.\d+)?)\]/);
+    return match ? parseFloat(match[1]) : null;
   };
 
   const getParticipantScore = (resp: SurveyResponse) => {
@@ -589,7 +589,7 @@ export default function InsightsTab({ session }: { session: Session }) {
                              
                              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-slate-700 text-sm whitespace-pre-wrap flex justify-between items-start gap-4">
                                <div className="flex-1">
-                                 {Array.isArray(answer) ? answer.join(', ') : answer.replace(/\[AI_SCORE:\s*\d+\]/g, '')}
+                                 {Array.isArray(answer) ? answer.join(', ') : answer.replace(/\[AI_SCORE:\s*\d+(?:\.\d+)?\]/g, '')}
                                </div>
                                {question.type === 'choice' && MCQ_CORRECT_ANSWERS[qId] && (
                                  <div className={`shrink-0 font-bold px-3 py-1.5 rounded-lg border shadow-sm text-xs flex flex-col items-center ${answer === MCQ_CORRECT_ANSWERS[qId] ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-red-100 text-red-700 border-red-200'}`}>
@@ -615,7 +615,7 @@ export default function InsightsTab({ session }: { session: Session }) {
                                                   ...r,
                                                   answers: {
                                                     ...r.answers,
-                                                    [qId]: (r.answers[qId] as string).replace(/\[AI_SCORE:\s*\d+\]/, `[AI_SCORE: ${val}]`)
+                                                    [qId]: (r.answers[qId] as string).replace(/\[AI_SCORE:\s*\d+(?:\.\d+)?\]/, `[AI_SCORE: ${val}]`)
                                                   }
                                                 };
                                               }

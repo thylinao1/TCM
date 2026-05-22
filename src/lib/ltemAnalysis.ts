@@ -18,6 +18,7 @@ import {
   effectSizeLabel,
   confidenceInterval95,
   histogram,
+  shapiroWilk,
   type PairedTTestResult,
   type WilcoxonResult,
   type HistogramBin,
@@ -75,6 +76,8 @@ export interface LtemReport {
   // Distribution check
   skew: number;
   isNormal: boolean;
+  shapiroW: number;
+  shapiroP: number;
   histogram: HistogramBin[];
   // Test selection + result
   designName: string;
@@ -157,6 +160,8 @@ export const buildLtemReport = (session: Session): LtemReport => {
     diffs: [],
     skew: 0,
     isNormal: true,
+    shapiroW: 1,
+    shapiroP: 1,
     histogram: [],
     designName: 'Pre-Post (single group)',
     testName: '-',
@@ -188,7 +193,9 @@ export const buildLtemReport = (session: Session): LtemReport => {
   const sdGain = sd(diffs);
   const pctImproved = (diffs.filter((d) => d > 0).length / diffs.length) * 100;
   const skew = skewness(diffs);
-  const isNormal = matched >= 25 && Math.abs(skew) < 1;
+  // Formal normality test (Shapiro-Wilk) on the gain scores.
+  const shapiro = shapiroWilk(diffs);
+  const isNormal = matched >= 25 && shapiro.isNormal;
 
   const tTest = pairedTTest(diffs);
   const wilcoxon = wilcoxonSignedRank(diffs);
@@ -197,11 +204,14 @@ export const buildLtemReport = (session: Session): LtemReport => {
   let testName: string;
   let testReason: string;
   let pValue: number;
+  const swText =
+    `the Shapiro-Wilk normality test gives W = ${shapiro.W.toFixed(3)}, ` +
+    `p = ${shapiro.pValue < 0.001 ? 'below 0.001' : shapiro.pValue.toFixed(3)}`;
   if (matched >= 25 && isNormal) {
     testName = 'Paired t-test';
     testReason =
-      'The sample is 25 or larger and the gain scores are approximately ' +
-      'normally distributed, so the paired t-test applies.';
+      `The sample is 25 or larger and ${swText}, which is above 0.05, so ` +
+      'normality is plausible and the paired t-test applies.';
     pValue = tTest.pValue;
   } else {
     testName = 'Wilcoxon signed-rank test';
@@ -209,7 +219,8 @@ export const buildLtemReport = (session: Session): LtemReport => {
       matched < 25
         ? 'The sample is smaller than 25, so the non-parametric Wilcoxon ' +
           'signed-rank test is the safer choice.'
-        : 'The gain scores are noticeably skewed, so the non-parametric ' +
+        : `${swText.charAt(0).toUpperCase()}${swText.slice(1)}, which is at or ` +
+          'below 0.05, so normality is doubtful and the non-parametric ' +
           'Wilcoxon signed-rank test is the safer choice.';
     pValue = wilcoxon.pValue;
   }
@@ -263,6 +274,8 @@ export const buildLtemReport = (session: Session): LtemReport => {
     diffs,
     skew,
     isNormal,
+    shapiroW: shapiro.W,
+    shapiroP: shapiro.pValue,
     histogram: histogram(diffs),
     designName: 'Pre-Post (single group)',
     testName,

@@ -249,6 +249,162 @@ export const confidenceInterval95 = (
 };
 
 // ---------------------------------------------------------------------------
+// Normality test (Shapiro-Wilk)
+// ---------------------------------------------------------------------------
+
+/** Inverse of the standard normal CDF (Acklam's algorithm). */
+export const qnorm = (p: number): number => {
+  if (p <= 0) return -Infinity;
+  if (p >= 1) return Infinity;
+  const a = [-3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2,
+    1.38357751867269e2, -3.066479806614716e1, 2.506628277459239];
+  const b = [-5.447609879822406e1, 1.615858368580409e2, -1.556989798598866e2,
+    6.680131188771972e1, -1.328068155288572e1];
+  const c = [-7.784894002430293e-3, -3.223964580411365e-1, -2.400758277161838,
+    -2.549732539343734, 4.374664141464968, 2.938163982698783];
+  const d = [7.784695709041462e-3, 3.224671290700398e-1, 2.445134137142996,
+    3.754408661907416];
+  const pLow = 0.02425;
+  if (p < pLow) {
+    const q = Math.sqrt(-2 * Math.log(p));
+    return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+      ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+  }
+  if (p <= 1 - pLow) {
+    const q = p - 0.5;
+    const r = q * q;
+    return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
+      (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+  }
+  const q = Math.sqrt(-2 * Math.log(1 - p));
+  return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+    ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1);
+};
+
+export interface ShapiroWilkResult {
+  W: number;
+  pValue: number;
+  isNormal: boolean;
+}
+
+/**
+ * Shapiro-Wilk test for normality (Royston 1992/1995, AS R94).
+ * The null hypothesis is that the sample came from a normal distribution;
+ * a p-value above 0.05 means normality is plausible.
+ */
+export const shapiroWilk = (xRaw: number[]): ShapiroWilkResult => {
+  const n = xRaw.length;
+  if (n < 3) return { W: 1, pValue: 1, isNormal: true };
+  const x = [...xRaw].sort((a, b) => a - b);
+
+  const poly = (cc: number[], v: number): number => {
+    let res = cc[0];
+    let vp = v;
+    for (let j = 1; j < cc.length; j++) { res += cc[j] * vp; vp *= v; }
+    return res;
+  };
+
+  const c1 = [0, 0.221157, -0.147981, -2.07119, 4.434685, -2.706056];
+  const c2 = [0, 0.042981, -0.293762, -1.752461, 5.682633, -3.582633];
+  const c3 = [0.544, -0.39978, 0.025054, -0.0006714];
+  const c4 = [1.3822, -0.77857, 0.062767, -0.0020322];
+  const c5 = [-1.5861, -0.31082, -0.083751, 0.0038915];
+  const c6 = [-0.4803, -0.082676, 0.0030302];
+  const g = [-2.273, 0.459];
+
+  const an = n;
+  const nn2 = Math.floor(n / 2);
+  const a: number[] = new Array(nn2 + 1).fill(0); // 1-indexed weights
+
+  if (n === 3) {
+    a[1] = Math.sqrt(0.5);
+  } else {
+    const an25 = an + 0.25;
+    let summ2 = 0;
+    for (let i = 1; i <= nn2; i++) {
+      a[i] = qnorm((i - 0.375) / an25);
+      summ2 += a[i] * a[i];
+    }
+    summ2 *= 2;
+    const ssumm2 = Math.sqrt(summ2);
+    const rsn = 1 / Math.sqrt(an);
+    const a1 = poly(c1, rsn) - a[1] / ssumm2;
+
+    let i1: number;
+    let fac: number;
+    if (n > 5) {
+      i1 = 3;
+      const a2 = -a[2] / ssumm2 + poly(c2, rsn);
+      fac = Math.sqrt((summ2 - 2 * a[1] * a[1] - 2 * a[2] * a[2]) /
+        (1 - 2 * a1 * a1 - 2 * a2 * a2));
+      a[1] = a1;
+      a[2] = a2;
+    } else {
+      i1 = 2;
+      fac = Math.sqrt((summ2 - 2 * a[1] * a[1]) / (1 - 2 * a1 * a1));
+      a[1] = a1;
+    }
+    for (let i = i1; i <= nn2; i++) a[i] = -a[i] / fac;
+  }
+
+  const range = x[n - 1] - x[0];
+  if (range < 1e-19) return { W: 1, pValue: 1, isNormal: true };
+
+  // Antisymmetric weight for sorted position i (j is its mirror index).
+  const weight = (i: number, j: number): number => {
+    if (i === j) return 0;
+    const k = Math.min(i, j) + 1;
+    return i > j ? a[k] : -a[k];
+  };
+
+  let sa = 0;
+  let sx = 0;
+  for (let i = 0, j = n - 1; i < n; i++, j--) {
+    sa += weight(i, j);
+    sx += x[i] / range;
+  }
+  sa /= n;
+  sx /= n;
+  let ssa = 0;
+  let ssx = 0;
+  let sax = 0;
+  for (let i = 0, j = n - 1; i < n; i++, j--) {
+    const asa = weight(i, j) - sa;
+    const xsx = x[i] / range - sx;
+    ssa += asa * asa;
+    ssx += xsx * xsx;
+    sax += asa * xsx;
+  }
+  const ssassx = Math.sqrt(ssa * ssx);
+  const w1 = ((ssassx - sax) * (ssassx + sax)) / (ssa * ssx);
+  const W = 1 - w1;
+
+  let pValue: number;
+  if (n === 3) {
+    const pi6 = 1.90985931710274;
+    const stqr = 1.0471975511966;
+    pValue = Math.max(0, Math.min(1, pi6 * (Math.asin(Math.sqrt(W)) - stqr)));
+  } else {
+    let y = Math.log(w1);
+    let m: number;
+    let s: number;
+    if (n <= 11) {
+      const gamma = poly(g, an);
+      if (gamma - y <= 0) return { W, pValue: 1e-19, isNormal: false };
+      y = -Math.log(gamma - y);
+      m = poly(c3, an);
+      s = Math.exp(poly(c4, an));
+    } else {
+      const xx = Math.log(an);
+      m = poly(c5, xx);
+      s = Math.exp(poly(c6, xx));
+    }
+    pValue = 1 - normalCDF((y - m) / s);
+  }
+  return { W, pValue, isNormal: pValue > 0.05 };
+};
+
+// ---------------------------------------------------------------------------
 // Histogram helper
 // ---------------------------------------------------------------------------
 
@@ -257,19 +413,22 @@ export interface HistogramBin {
   count: number;
 }
 
-/** Bin values into integer-width buckets for a simple gain-score histogram. */
-export const histogram = (xs: number[]): HistogramBin[] => {
+/** Bin values into `targetBins` equal-width buckets for a gain-score histogram. */
+export const histogram = (xs: number[], targetBins = 8): HistogramBin[] => {
   if (xs.length === 0) return [];
-  const lo = Math.floor(Math.min(...xs));
-  const hi = Math.ceil(Math.max(...xs));
-  const bins: HistogramBin[] = [];
-  for (let b = lo; b < hi; b++) {
-    const count = xs.filter((x) => x >= b && x < b + 1).length;
-    bins.push({ label: `${b} to ${b + 1}`, count });
+  const min = Math.min(...xs);
+  const max = Math.max(...xs);
+  if (max - min < 1e-9) {
+    return [{ label: min.toFixed(1), count: xs.length }];
   }
-  // Include the upper edge in the final bin.
-  if (bins.length > 0) {
-    bins[bins.length - 1].count += xs.filter((x) => x === hi).length;
+  const width = (max - min) / targetBins;
+  const bins: HistogramBin[] = [];
+  for (let i = 0; i < targetBins; i++) {
+    const lo = min + i * width;
+    const hi = lo + width;
+    const last = i === targetBins - 1;
+    const count = xs.filter((x) => x >= lo && (last ? x <= hi + 1e-9 : x < hi)).length;
+    bins.push({ label: lo.toFixed(1), count });
   }
   return bins;
 };
