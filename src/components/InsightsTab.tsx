@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { mockAiScenariosLibrary } from '../data/mockData';
 import { Check, X, FileOutput, FileText, UserCircle, Sparkles, BarChart2, MessageSquare, Star, ThumbsUp, Target, TrendingUp, TrendingDown, Minus, ArrowRight } from 'lucide-react';
 import type { Session, SurveyResponse, FeedbackScenario } from '../types';
 import { scoreResponseWithAI } from '../lib/aiScoring';
 import type { AiScoreResult } from '../lib/scoringSchema';
+import { buildLtemReport } from '../lib/ltemAnalysis';
 
 const MCQ_CORRECT_ANSWERS: Record<string, string> = {
   '2a': 'Facilitate, Appreciate, Innovate, Resolve',
@@ -13,6 +14,8 @@ const MCQ_CORRECT_ANSWERS: Record<string, string> = {
 };
 
 export default function InsightsTab({ session }: { session: Session }) {
+  // Real cohort statistics, used to generate the executive summary below.
+  const ltem = useMemo(() => buildLtemReport(session), [session]);
   const [activeView, setActiveView] = useState<'overview' | 'responses' | 'progress'>('overview');
   const [stageFilter, setStageFilter] = useState<'pre' | 'end' | 'refresher'>('end');
   const [selectedResponseIdx, setSelectedResponseIdx] = useState(0);
@@ -297,12 +300,47 @@ export default function InsightsTab({ session }: { session: Session }) {
                  LTEM Tier 5 &amp; 6 Executive Summary
                </h2>
                <div className="text-indigo-100 text-lg leading-relaxed space-y-4">
-                 <p>
-                   Overall, the cohort demonstrated a <strong className="text-white">high level of theoretical proficiency</strong> in conflict de-escalation, specifically citing the "structured empathy framework" and "resolution triangle" as key takeaways. Analyzing the real-world simulated scenarios, <strong className="text-emerald-300">80% of trainees</strong> correctly identified private 1-on-1 interventions as the correct primary action.
-                 </p>
-                 <p>
-                   <strong className="text-amber-300">Areas for Improvement:</strong> The What You Did data indicates that while intent remains high, practical application drops when participants are faced with rapid, high-pressure demands (e.g. from vendors or senior stakeholders). We recommend focusing the next coaching block on high-pressure tactical roleplays.
-                 </p>
+                 {ltem.hasData ? (
+                   <>
+                     <p>
+                       Across the <strong className="text-white">{ltem.matched} learners</strong> who completed
+                       both the What You Know and What You Learnt assessments, decision-making scores rose from
+                       an average of <strong className="text-white">{ltem.meanPre.toFixed(1)}</strong> to{' '}
+                       <strong className="text-emerald-300">{ltem.meanEnd.toFixed(1)} out of 10</strong>, an
+                       average gain of {ltem.meanGain.toFixed(1)} points, with {ltem.pctImproved.toFixed(0)}% of
+                       the cohort improving. The effect size (Cohen&rsquo;s d = {ltem.d.toFixed(2)}) is{' '}
+                       {ltem.dLabel.toLowerCase()}, and the {ltem.testName.toLowerCase()}{' '}
+                       {ltem.significant
+                         ? 'confirms the improvement is statistically reliable.'
+                         : 'cannot yet confirm significance at this sample size.'}
+                     </p>
+                     <p>
+                       <strong className="text-amber-300">Retention and next steps:</strong>{' '}
+                       {ltem.retention ? (
+                         <>
+                           At the refresher, conducted months later, the cohort held{' '}
+                           <strong className="text-white">{ltem.retention.retained.toFixed(0)}%</strong> of its
+                           end-of-course level ({ltem.retention.meanEnd.toFixed(1)} to{' '}
+                           {ltem.retention.meanRefresher.toFixed(1)} out of 10).{' '}
+                           {ltem.retention.retained >= 88
+                             ? 'Retention is strong, evidence the learning transferred and held.'
+                             : ltem.retention.retained >= 75
+                             ? 'Retention is moderate; a short reinforcement block would help consolidate it.'
+                             : 'Retention has slipped; the next coaching block should reinforce the areas that faded.'}
+                         </>
+                       ) : (
+                         'Refresher data is not yet in, so on-the-job retention cannot be assessed.'
+                       )}{' '}
+                       Full statistical detail is in the Evaluation Report tab.
+                     </p>
+                   </>
+                 ) : (
+                   <p>
+                     This cohort does not yet have enough matched pre and post responses for a summary.
+                     Once learners complete both the What You Know and What You Learnt forms, an
+                     evidence-based summary will appear here automatically.
+                   </p>
+                 )}
                </div>
              </div>
           </div>
@@ -389,7 +427,7 @@ export default function InsightsTab({ session }: { session: Session }) {
                      {cohortScorePct}%
                    </div>
                    <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">
-                     {totalEarned} / {totalPossible} Total Points
+                     {Math.round(totalEarned)} / {totalPossible} Total Points
                    </div>
                 </div>
              </div>
@@ -453,21 +491,21 @@ export default function InsightsTab({ session }: { session: Session }) {
                   <div className="flex flex-col items-center gap-1">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider md:hidden">What You Know</span>
                     <ScorePill pct={t.pre.pct} />
-                    {t.pre.score !== null && <span className="text-[10px] text-slate-400">{t.pre.score}/{t.pre.score !== null ? (t.pre.pct !== null ? Math.round(t.pre.score / (t.pre.pct / 100)) : '?') : '?'} pts</span>}
+                    {t.pre.score !== null && <span className="text-[10px] text-slate-400">{Math.round(t.pre.score)} pts</span>}
                   </div>
 
                   {/* End */}
                   <div className="flex flex-col items-center gap-1">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider md:hidden">What You Learnt</span>
                     <ScorePill pct={t.end.pct} />
-                    {t.end.score !== null && <span className="text-[10px] text-slate-400">{t.end.score} pts</span>}
+                    {t.end.score !== null && <span className="text-[10px] text-slate-400">{Math.round(t.end.score)} pts</span>}
                   </div>
 
                   {/* Refresher */}
                   <div className="flex flex-col items-center gap-1">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider md:hidden">What You Did</span>
                     <ScorePill pct={t.refresher.pct} />
-                    {t.refresher.score !== null && <span className="text-[10px] text-slate-400">{t.refresher.score} pts</span>}
+                    {t.refresher.score !== null && <span className="text-[10px] text-slate-400">{Math.round(t.refresher.score)} pts</span>}
                   </div>
 
                   {/* Trend */}
@@ -544,7 +582,7 @@ export default function InsightsTab({ session }: { session: Session }) {
                          if (score.possible > 0) {
                            return (
                              <div className="text-right">
-                               <div className="text-xl font-black text-emerald-500">{score.earned}/{score.possible}</div>
+                               <div className="text-xl font-black text-emerald-500">{Math.round(score.earned)}/{score.possible}</div>
                                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Score</div>
                              </div>
                            );
@@ -683,6 +721,11 @@ export default function InsightsTab({ session }: { session: Session }) {
                                        <Sparkles size={14} className="text-indigo-300" />
                                        <h5 className="text-xs font-bold uppercase tracking-wider">Live AI Score — {aiDetail.score} / 10</h5>
                                        <span className="text-[9px] font-semibold uppercase tracking-wider bg-indigo-700/60 text-indigo-100 px-1.5 py-0.5 rounded">{aiDetail.targetTier}</span>
+                                       {aiDetail.rawScore !== undefined && aiDetail.rawScore !== aiDetail.score && (
+                                         <span className="text-[9px] font-semibold uppercase tracking-wider bg-indigo-800/60 text-indigo-200 px-1.5 py-0.5 rounded">
+                                           calibrated from raw {aiDetail.rawScore}
+                                         </span>
+                                       )}
                                      </div>
                                      <p className="text-xs leading-relaxed text-indigo-100 mb-3">{aiDetail.justification}</p>
                                      <ul className="space-y-1.5">

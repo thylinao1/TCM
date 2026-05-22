@@ -26,6 +26,10 @@ export const aiScoreSchema = z.object({
   targetTier: z.string(),
   criteria: z.array(criterionResultSchema),
   justification: z.string().min(1),
+  // Present on responses from /api/score: the raw model score before the
+  // benchmarked linear calibration is applied. The model itself never
+  // returns this field, so it is optional.
+  rawScore: z.number().int().min(0).max(10).optional(),
 });
 
 export type CriterionResult = z.infer<typeof criterionResultSchema>;
