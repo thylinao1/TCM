@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { initialSessions } from '../data/mockData';
 import type { Question, QuestionType } from '../types';
-import { ArrowLeft, Play, QrCode, Plus, Trash2, Edit2, Copy, CheckCircle2, X, Save, BarChart2 } from 'lucide-react';
+import { ArrowLeft, Play, QrCode, Plus, Trash2, Edit2, Copy, CheckCircle2, X, Save, BarChart2, FlaskConical } from 'lucide-react';
 import InsightsTab from '../components/InsightsTab';
+import EvaluationReport from '../components/EvaluationReport';
 
 export default function SessionDetail() {
   const { id } = useParams<{ id: string }>();
   const [session, setSession] = useState(() => initialSessions.find(s => s.id === id) || null);
-  const [activeTab, setActiveTab] = useState<'pre' | 'end' | 'refresher' | 'insights'>('pre');
+  const [activeTab, setActiveTab] = useState<'pre' | 'end' | 'refresher' | 'insights' | 'report'>('pre');
   
   const [showQRModal, setShowQRModal] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -28,7 +29,8 @@ export default function SessionDetail() {
     );
   }
 
-  const currentSurvey = activeTab !== 'insights' ? session.surveys[activeTab] : null;
+  const currentSurvey =
+    activeTab === 'insights' || activeTab === 'report' ? null : session.surveys[activeTab];
 
   const handleCopyLink = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -153,13 +155,13 @@ export default function SessionDetail() {
 
       {/* Tabs */}
       <div className="bg-white rounded-2xl p-1.5 shadow-sm border border-slate-200 flex flex-wrap gap-2">
-        {(['pre', 'end', 'refresher', 'insights'] as const).map(tab => (
-           <button 
+        {(['pre', 'end', 'refresher', 'insights', 'report'] as const).map(tab => (
+           <button
              key={tab}
              onClick={() => setActiveTab(tab)}
              className={`px-5 py-3 rounded-xl font-semibold text-sm transition-all flex-1 md:flex-none text-center outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 flex items-center justify-center gap-2 ${
-               activeTab === tab 
-                 ? (tab === 'insights' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-900 text-white shadow-md')
+               activeTab === tab
+                 ? (tab === 'insights' || tab === 'report' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-900 text-white shadow-md')
                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
              }`}
            >
@@ -167,6 +169,7 @@ export default function SessionDetail() {
              {tab === 'end' && 'What You Learnt'}
              {tab === 'refresher' && 'What You Did'}
              {tab === 'insights' && <><BarChart2 size={16} /> Evaluation Insights</>}
+             {tab === 'report' && <><FlaskConical size={16} /> Evaluation Report</>}
            </button>
         ))}
       </div>
@@ -174,6 +177,8 @@ export default function SessionDetail() {
       {/* Survey Editor View */}
       {activeTab === 'insights' ? (
         <InsightsTab session={session} />
+      ) : activeTab === 'report' ? (
+        <EvaluationReport session={session} />
       ) : currentSurvey ? (
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-4 duration-500" key={activeTab}>
           <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">

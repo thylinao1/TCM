@@ -404,6 +404,121 @@ export const mockPopulatedResponses: SurveyResponse[] = [
   }
 ];
 
+// ---------------------------------------------------------------------------
+// Generated demonstration cohort
+// ---------------------------------------------------------------------------
+// To show the Statistical Evaluation Report working on a realistic sample,
+// the demo cohort is expanded to 26 learners. The five hand-written learners
+// above are kept for the detailed Raw Responses view; the additional learners
+// below are generated deterministically, so every figure on the report is
+// stable between page loads.
+
+const mulberry32 = (seed: number) => () => {
+  seed |= 0;
+  seed = (seed + 0x6d2b79f5) | 0;
+  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+};
+
+const rng = mulberry32(20260410);
+// Approximate normal draw from the sum of four uniforms.
+const gauss = (m: number, s: number) =>
+  m + (s / 0.5774) * (rng() + rng() + rng() + rng() - 2);
+const clamp = (x: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, x));
+const scoreInt = (x: number) => Math.round(clamp(x, 0, 10));
+
+const generatedNames = [
+  'Priya Nair', 'Tom Whitfield', 'Grace Adeyemi', 'Daniel Okonkwo',
+  'Hannah Brooks', 'Marcus Bell', 'Aisha Khan', 'Oliver Reed',
+  'Sofia Marchetti', 'Liam Donnelly', 'Chloe Bennett', 'Raj Patel',
+  'Emma Lindqvist', 'Noah Carter', 'Yusuf Demir', 'Isabel Cruz',
+  'Ben Harrington', 'Maya Goldberg', 'Connor Walsh', 'Freya Nilsson',
+  'Adam Saunders',
+];
+
+const MCQ_BANK: Record<string, { correct: string; wrong: string[] }> = {
+  '2a': {
+    correct: 'Facilitate, Appreciate, Innovate, Resolve',
+    wrong: ['Focus, Analyze, Implement, Review', 'Facilitate, Assess, Integrate, Resolve', 'Find, Address, Innovate, Restore'],
+  },
+  '2b': {
+    correct: 'Validating emotions without validating behavior',
+    wrong: ["Agreeing with the person's actions", "Pointing out the person's mistakes immediately", 'Ignoring emotions to focus on facts'],
+  },
+  '2c': {
+    correct: 'To respect physiological boundaries and allow emotions to settle',
+    wrong: ['To punish the parties involved', 'To avoid dealing with the conflict', 'To allow time to gather disciplinary evidence'],
+  },
+  '2d': {
+    correct: 'Stating observable behaviors without labels or judgments',
+    wrong: ['Telling people exactly what they must do', 'Using labels to categorize bad attitudes', 'Forcing immediate compromises'],
+  },
+};
+
+const pickMcq = (qid: string, pCorrect: number): string => {
+  const m = MCQ_BANK[qid];
+  if (rng() < pCorrect) return m.correct;
+  return m.wrong[Math.floor(rng() * m.wrong.length)];
+};
+
+const answerLine = (band: number): string => {
+  if (band >= 8) return 'I separated the parties calmly, gave a short cooling-off period, then followed up privately to understand each perspective before bringing them together.';
+  if (band >= 6) return 'I spoke to each person individually first, kept the focus on observable behaviour rather than blame, and agreed clear next steps with them.';
+  if (band >= 4) return 'I tried to get them to talk it through, though I moved to a solution fairly quickly rather than fully exploring the underlying issue.';
+  return 'I told them to sort it out and be professional, and escalated it when that did not work.';
+};
+
+const generatedCohort: SurveyResponse[] = [];
+generatedNames.forEach((name, i) => {
+  const email = name.toLowerCase().replace(/[^a-z]+/g, '.') + '@acme.corp';
+  const preMean = clamp(gauss(2.6, 1.3), 0, 6);
+  const gain = clamp(gauss(3.7, 2.3), -1.5, 7);
+  const endMean = clamp(preMean + gain, 0.6, 9.4);
+  const refMean = clamp(endMean - gauss(0.6, 1.1), 0.6, 9.4);
+
+  const stageBlock = (
+    stage: 'pre' | 'end' | 'refresher',
+    sMean: number,
+    daysAgo: number,
+  ): SurveyResponse => {
+    const q1 = scoreInt(sMean + gauss(0, 0.9));
+    const q2 = scoreInt(sMean + gauss(0, 0.9));
+    const pCorrect = clamp(0.15 + sMean / 12, 0.1, 0.95);
+    const answers: Record<string, string | string[]> = {
+      '1': `${answerLine(q1)} [AI_SCORE: ${q1}]`,
+      '2': `${answerLine(q2)} [AI_SCORE: ${q2}]`,
+      '2a': pickMcq('2a', pCorrect),
+      '2b': pickMcq('2b', pCorrect),
+      '2c': pickMcq('2c', pCorrect),
+      '2d': pickMcq('2d', pCorrect),
+    };
+    if (stage === 'end' || stage === 'refresher') {
+      answers['9'] = sMean >= 4 ? 'Yes' : rng() < 0.5 ? 'Maybe' : 'No';
+    }
+    if (stage === 'end') {
+      answers['13'] = String(clamp(Math.round(2.6 + sMean * 0.3 + gauss(0, 0.4)), 1, 5));
+    }
+    return {
+      id: `gen-${stage}-${i}`,
+      stage,
+      participantName: name,
+      participantEmail: email,
+      submittedAt: new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString(),
+      answers,
+    };
+  };
+
+  generatedCohort.push(stageBlock('pre', preMean, 31));
+  generatedCohort.push(stageBlock('end', endMean, 29));
+  generatedCohort.push(stageBlock('refresher', refMean, 1));
+});
+
+export const demoCohortResponses: SurveyResponse[] = [
+  ...mockPopulatedResponses,
+  ...generatedCohort,
+];
+
 export const initialSessions: Session[] = [
   {
     id: 'b6e83',
@@ -418,7 +533,7 @@ export const initialSessions: Session[] = [
       end: endSessionTemplate,
       refresher: refresherTemplate
     },
-    responses: mockPopulatedResponses,
+    responses: demoCohortResponses,
   },
   {
     id: 'f9a21',
