@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Settings, FileText } from 'lucide-react';
+import { LayoutDashboard, Settings, FileText, ShieldCheck } from 'lucide-react';
 
 const Layout = () => {
   const location = useLocation();
@@ -7,6 +7,7 @@ const Layout = () => {
   const navItems = [
     { path: '/', label: 'Sessions', icon: <LayoutDashboard size={20} /> },
     { path: '/exemplar', label: 'Exemplar Form', icon: <FileText size={20} /> },
+    { path: '/validation', label: 'AI Scorer Validation', icon: <ShieldCheck size={20} /> },
   ];
 
   return (
