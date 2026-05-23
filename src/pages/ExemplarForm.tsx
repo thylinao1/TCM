@@ -4,7 +4,7 @@ import {
 } from '../data/mockData';
 import type { Question, SurveyTemplate } from '../types';
 import {
-  ArrowLeft, MessageSquareText, ListChecks, Star, Briefcase, Check, X, Sparkles, Clock,
+  ArrowLeft, MessageSquareText, ListChecks, Star, Briefcase, Building2, Check, X, Sparkles, Clock,
 } from 'lucide-react';
 
 /**
@@ -16,23 +16,50 @@ import {
  * the forms look like.
  */
 
-type TierKey = 'decision' | 'knowledge' | 'survey' | 'operational';
+type TierKey = 'decision' | 'transfer' | 'knowledge' | 'survey' | 'operational';
 
 const TIERS: Record<TierKey, { label: string; chip: string; icon: typeof Star }> = {
   decision: { label: 'Tier 5 to 6 - Decision-Making & Task Competence', chip: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: MessageSquareText },
+  transfer: { label: 'Tier 7 - Transfer to the Workplace', chip: 'bg-teal-100 text-teal-700 border-teal-200', icon: Building2 },
   knowledge: { label: 'Tier 4 - Knowledge', chip: 'bg-amber-100 text-amber-700 border-amber-200', icon: ListChecks },
   survey: { label: 'Tier 3 - Learner Survey', chip: 'bg-sky-100 text-sky-700 border-sky-200', icon: Star },
   operational: { label: 'Operational - not an LTEM tier', chip: 'bg-slate-100 text-slate-500 border-slate-200', icon: Briefcase },
 };
 
-/** Classify a question into the LTEM tier it measures. */
-const tierOf = (q: Question): TierKey => {
-  if (q.id === '1' || q.id === '2') return 'decision'; // open-ended scenarios
-  if (['2a', '2b', '2c', '2d'].includes(q.id)) return 'knowledge'; // knowledge MCQs
-  if (['9', '10', '11', '12'].includes(q.id)) return 'operational'; // consent / services
-  if (q.type === 'scale') return 'survey';
-  return 'survey'; // reflective and confidence questions
+/**
+ * The LTEM tier each question measures, mapped explicitly per form.
+ *
+ * It has to be per-form, not per-question-id, because the same question
+ * number means different things on different forms. For example Q9 is a
+ * marketing-consent question on the pre-course form (operational) but a
+ * "would you recommend" satisfaction question on the later forms (Tier 3).
+ * The refresher form's reflective questions ask about real workplace
+ * application, which is Tier 7 (transfer to work).
+ */
+const TIER_MAP: Record<'pre' | 'end' | 'refresher', Record<string, TierKey>> = {
+  pre: {
+    '1': 'decision', '2': 'decision',
+    '2a': 'knowledge', '2b': 'knowledge', '2c': 'knowledge', '2d': 'knowledge',
+    '3': 'survey', '4': 'survey', '5': 'survey', '6': 'survey', '7': 'survey', '8': 'survey',
+    '9': 'operational', '10': 'operational',
+  },
+  end: {
+    '1': 'decision', '2': 'decision',
+    '2a': 'knowledge', '2b': 'knowledge', '2c': 'knowledge', '2d': 'knowledge',
+    '3': 'survey', '4': 'survey', '5': 'survey', '6': 'survey', '7': 'survey', '8': 'survey',
+    '9': 'survey', '10': 'operational', '11': 'operational', '12': 'operational', '13': 'survey',
+  },
+  refresher: {
+    '1': 'decision', '2': 'decision',
+    '2a': 'knowledge', '2b': 'knowledge', '2c': 'knowledge', '2d': 'knowledge',
+    '3': 'transfer', '4': 'transfer', '5': 'survey', '6': 'transfer', '7': 'survey', '8': 'survey',
+    '9': 'survey', '10': 'operational', '11': 'operational', '12': 'operational',
+  },
 };
+
+/** Classify a question into the LTEM tier it measures. */
+const tierOf = (stage: 'pre' | 'end' | 'refresher', q: Question): TierKey =>
+  TIER_MAP[stage][q.id] ?? 'survey';
 
 /** Map a form's two scenario questions to their AI rubric entries. */
 const rubricFor = (stage: 'pre' | 'end' | 'refresher', qId: string) => {
@@ -141,7 +168,7 @@ export default function ExemplarForm() {
 
           <ol className="divide-y divide-slate-100">
             {f.template.questions.map((q, idx) => {
-              const tk = tierOf(q);
+              const tk = tierOf(f.stage, q);
               const T = TIERS[tk];
               const Icon = T.icon;
               const isScenario = tk === 'decision';
@@ -243,7 +270,9 @@ export default function ExemplarForm() {
           an overconfident learner who answers poorly still scores low. And because the
           before and after scenarios are cloned rather than identical, the comparison stays
           honest. The knowledge and reflective questions sit alongside the scenarios so each
-          form still gives the trainer a rounded picture of the learner.
+          form still gives the trainer a rounded picture of the learner. On the final form,
+          the reflective questions ask about real workplace situations, which is where the
+          evidence reaches Tier 7, transfer into the job.
         </p>
       </div>
     </div>

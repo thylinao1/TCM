@@ -48,7 +48,7 @@ export default function InsightsTab({ session }: { session: Session }) {
     setScoreError(null);
     try {
       const learnerResponse = rawAnswer.replace(/\[AI_SCORE:\s*\d+(?:\.\d+)?\]/g, '').trim();
-      if (!learnerResponse) throw new Error('This response is empty — there is nothing to score.');
+      if (!learnerResponse) throw new Error('This response is empty, there is nothing to score.');
       const result = await scoreResponseWithAI({ scenario, learnerResponse });
       setAiDetails(prev => ({ ...prev, [key]: result }));
       setAllResponses(prev => prev.map(r => {
@@ -203,7 +203,7 @@ export default function InsightsTab({ session }: { session: Session }) {
       if (end.pct !== null) {
         const change = refresher.pct - end.pct;
         if (change >= 0) narrativeParts.push(`What You Did shows sustained retention at ${refresher.pct}%.`);
-        else narrativeParts.push(`What You Did shows a drop to ${refresher.pct}% — application in practice may need reinforcement.`);
+        else narrativeParts.push(`What You Did shows a drop to ${refresher.pct}%. Application in practice may need reinforcement.`);
       } else {
         narrativeParts.push(`What You Did score: ${refresher.pct}%.`);
       }
@@ -214,7 +214,7 @@ export default function InsightsTab({ session }: { session: Session }) {
   });
 
   const ScorePill = ({ pct }: { pct: number | null }) => {
-    if (pct === null) return <span className="text-slate-300 text-sm font-medium italic">—</span>;
+    if (pct === null) return <span className="text-slate-300 text-sm font-medium italic">n/a</span>;
     const color = pct >= 75 ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : pct >= 50 ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-rose-100 text-rose-800 border-rose-200';
     return (
       <span className={`inline-flex items-center justify-center min-w-[52px] px-3 py-1 rounded-full text-sm font-bold border ${color}`}>
@@ -446,7 +446,7 @@ export default function InsightsTab({ session }: { session: Session }) {
                 <TrendingUp size={22} className="text-violet-300" /> Trainee Progress Tracker
               </h3>
               <p className="text-indigo-200 leading-relaxed text-sm max-w-2xl">
-                Compare each trainee's decision-making assessment score across all three form stages — What You Know, What You Learnt, and What You Did — to identify who is embedding learning and who needs additional support.
+                Compare each trainee's decision-making assessment score across all three form stages (What You Know, What You Learnt, and What You Did) to identify who is embedding learning and who needs additional support.
               </p>
               <div className="mt-4 flex gap-4 flex-wrap text-xs">
                 <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full font-semibold">
@@ -719,7 +719,7 @@ export default function InsightsTab({ session }: { session: Session }) {
                                    <div className="mt-4 bg-indigo-950 rounded-xl p-4 text-indigo-50">
                                      <div className="flex items-center gap-2 mb-2 flex-wrap">
                                        <Sparkles size={14} className="text-indigo-300" />
-                                       <h5 className="text-xs font-bold uppercase tracking-wider">Live AI Score — {aiDetail.score} / 10</h5>
+                                       <h5 className="text-xs font-bold uppercase tracking-wider">Live AI Score: {aiDetail.score} / 10</h5>
                                        <span className="text-[9px] font-semibold uppercase tracking-wider bg-indigo-700/60 text-indigo-100 px-1.5 py-0.5 rounded">{aiDetail.targetTier}</span>
                                        {aiDetail.rawScore !== undefined && aiDetail.rawScore !== aiDetail.score && (
                                          <span className="text-[9px] font-semibold uppercase tracking-wider bg-indigo-800/60 text-indigo-200 px-1.5 py-0.5 rounded">
@@ -734,7 +734,7 @@ export default function InsightsTab({ session }: { session: Session }) {
                                            {c.met
                                              ? <Check size={13} className={`shrink-0 mt-0.5 ${c.type === 'success' ? 'text-emerald-400' : 'text-rose-400'}`} />
                                              : <X size={13} className="shrink-0 mt-0.5 text-slate-500" />}
-                                           <span className="text-indigo-100"><span className="font-semibold">{c.criterion}</span>{c.evidence ? ` — ${c.evidence}` : ''}</span>
+                                           <span className="text-indigo-100"><span className="font-semibold">{c.criterion}</span>{c.evidence ? `: ${c.evidence}` : ''}</span>
                                          </li>
                                        ))}
                                      </ul>
