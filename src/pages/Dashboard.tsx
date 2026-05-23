@@ -126,6 +126,44 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+
+      {/* Orientation banner for first-time visitors */}
+      <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-violet-900 rounded-3xl p-7 md:p-8 text-white shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -mr-20 -mt-20" />
+        <div className="relative z-10 space-y-3">
+          <div className="flex items-center gap-2">
+            <Sparkles size={18} className="text-indigo-300" />
+            <h2 className="text-sm font-bold uppercase tracking-widest text-indigo-200">
+              Working prototype
+            </h2>
+          </div>
+          <p className="text-lg leading-relaxed max-w-3xl">
+            This is a prototype of the platform that operationalises the LTEM model for The TCM
+            Group. It shows how the evaluation works from end to end, and is not a finished
+            product.
+          </p>
+          <p className="text-sm text-indigo-100 leading-relaxed max-w-3xl">
+            To see it with real data, open the{' '}
+            <Link
+              to="/session/b6e83"
+              className="font-semibold text-white underline decoration-indigo-400 underline-offset-2 hover:decoration-white"
+            >
+              Practical Mediation Skills (Q3)
+            </Link>{' '}
+            session in the table below. Inside you will find the three evaluation forms (What You
+            Know, What You Learnt and What You Did), an Evaluation Insights view with each
+            trainee's progress, and an Evaluation Report, a plain-language statistical summary
+            the platform generates on its own.
+          </p>
+          <p className="text-sm text-indigo-100 leading-relaxed max-w-3xl">
+            Two pages in the menu on the left give the wider picture. <span className="font-semibold text-white">Exemplar Form</span>{' '}
+            lays out every question with the LTEM tier it measures, and{' '}
+            <span className="font-semibold text-white">AI Scorer Validation</span> shows the AI
+            scorer checked against human markers.
+          </p>
+        </div>
+      </div>
+
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Active Sessions</h1>
