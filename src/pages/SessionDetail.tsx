@@ -155,23 +155,40 @@ export default function SessionDetail() {
 
       {/* Tabs */}
       <div className="bg-white rounded-2xl p-1.5 shadow-sm border border-slate-200 flex flex-wrap gap-2">
-        {(['pre', 'end', 'refresher', 'insights', 'report'] as const).map(tab => (
-           <button
-             key={tab}
-             onClick={() => setActiveTab(tab)}
-             className={`px-5 py-3 rounded-xl font-semibold text-sm transition-all flex-1 md:flex-none text-center outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 flex items-center justify-center gap-2 ${
-               activeTab === tab
-                 ? (tab === 'insights' || tab === 'report' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-900 text-white shadow-md')
-                 : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
-             }`}
-           >
-             {tab === 'pre' && 'What You Know'}
-             {tab === 'end' && 'What You Learnt'}
-             {tab === 'refresher' && 'What You Did'}
-             {tab === 'insights' && <><BarChart2 size={16} /> Evaluation Insights</>}
-             {tab === 'report' && <><FlaskConical size={16} /> Evaluation Report</>}
-           </button>
-        ))}
+        {(['pre', 'end', 'refresher', 'insights', 'report'] as const).map(tab => {
+          const isAttentionTab = tab === 'insights' || tab === 'report'
+          const showAttentionHighlight = isAttentionTab && activeTab !== tab
+          return (
+            <div key={tab} className="relative flex-1 md:flex-none">
+              {showAttentionHighlight && (
+                <>
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -inset-3 rounded-full bg-amber-300/60 blur-xl animate-pulse"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -inset-0.5 rounded-2xl ring-2 ring-amber-400 animate-pulse"
+                  />
+                </>
+              )}
+              <button
+                onClick={() => setActiveTab(tab)}
+                className={`relative w-full px-5 py-3 rounded-xl font-semibold text-sm transition-all text-center outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 flex items-center justify-center gap-2 ${
+                  activeTab === tab
+                    ? (tab === 'insights' || tab === 'report' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-900 text-white shadow-md')
+                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
+                }`}
+              >
+                {tab === 'pre' && 'What You Know'}
+                {tab === 'end' && 'What You Learnt'}
+                {tab === 'refresher' && 'What You Did'}
+                {tab === 'insights' && <><BarChart2 size={16} /> Evaluation Insights</>}
+                {tab === 'report' && <><FlaskConical size={16} /> Evaluation Report</>}
+              </button>
+            </div>
+          )
+        })}
       </div>
 
       {/* Survey Editor View */}
